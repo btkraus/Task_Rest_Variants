@@ -1,16 +1,11 @@
-parpool('local', 28)     %% Name of cluster profile for batch job
+parpool('local', 28) %% Name of cluster profile for batch job, how many workers are allocated to perform this job
 
-%/davta/vnil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_motor_passvv2/
-%/data/nil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_mem_pass2/
-%/data/nil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_mixed_pass2/
 clear all
 
-outdir = '/projects/b1081/Brian_MSC/dconn_task_files';
-dataLocStem = '/MSC/TaskFC/';
-%subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC10'};
+outdir = '/projects/b1081/Brian_MSC/dconn_task_files';%change this to your output directory
+dataLocStem = '/MSC/TaskFC/';%directory where the data are located
 subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC09','MSC10'};
 tasks = {'motor','mem','mixed'};
-%tasks = {'mem'};
 
 CortexOnly = 1; %% Toggles whether to run correlations on cortex only
 SplitHalf = 1;  %% Toggles whether to create a separate file for odd/even sessions
@@ -28,24 +23,17 @@ SaveTimeseries = 1;     %% Save concatenated timeseries for subject
 cd '/projects/b1081';   %% Change CD to root project directory
 
 disp(sprintf('Job Submitted: %s', datestr(now)));
-
-
-
-
 disp(sprintf('Job Started: %s', datestr(now)));
 
 if CortexOnly == 1      %% Select correct number of voxels for template
-    
     voxnum = 59412;
-    
 else
-    
     voxnum = 65625;
-    
 end
-
+%%
+%%What are these variables? What is the difference between these and the
+%%variables in the for loop below
 if MatchData == 1 && MatchAcrossSubs == 1
-
    	memptsoddsum = [];
    	motorptsoddsum = [];
    	mixedptsoddsum = [];
@@ -54,7 +42,7 @@ if MatchData == 1 && MatchAcrossSubs == 1
    	mixedptsevensum = [];
 
     for n=1:numel(subs)
-    
+        %change path to local directory where QC files are located
         load (['/projects/b1081/Brian_MSC/QC_files/' subs{n} '_QCFile.mat']);
         
         memptsodd = [];
@@ -64,28 +52,20 @@ if MatchData == 1 && MatchAcrossSubs == 1
         motorptseven = [];
         mixedptseven = [];
         
+        %What is this for loop doing? Getting values for the variables
+        %above from QC files, but what are these variables?
         for u = 1:length(SubStruct)
-            
             if SubStruct(u).OddEven == 1
-                
                 memptsodd = [memptsodd; SubStruct(u).MemSampPts];
                 mixedptsodd = [mixedptsodd; SubStruct(u).MixedSampPts];
-            
                 if ~strcmp(subs{n}, 'MSC09')
-            
                     motorptsodd = [motorptsodd; SubStruct(u).MotorSampPts];
-                
                 end
-                
             elseif SubStruct(u).OddEven == 2
-                
                 memptseven = [memptseven; SubStruct(u).MemSampPts];
                 mixedptseven = [mixedptseven; SubStruct(u).MixedSampPts];
-            
                 if ~strcmp(subs{n}, 'MSC09')
-            
                     motorptseven = [motorptseven; SubStruct(u).MotorSampPts];
-                
                 end
       
             end
@@ -93,46 +73,29 @@ if MatchData == 1 && MatchAcrossSubs == 1
     
         memptsoddsum = [memptsoddsum; sum(memptsodd)];
         
+        %Why does MSC09 get dealt with differently? Not enough motor data?
         if strcmp(subs{n}, 'MSC09')
-        
             motorptsoddsum = [motorptsoddsum; 9999];
-            
         else
-            
             motorptsoddsum = [motorptsoddsum; sum(motorptsodd)];
-            
         end
         
         mixedptsoddsum = [mixedptsoddsum; sum(mixedptsodd)];
         memptsevensum = [memptsevensum; sum(memptseven)];
         
         if strcmp(subs{n}, 'MSC09')
-            
-%            if SplitHalf == 1 && ConcatenateTaskData == 1
-        
-                motorptsevensum = [motorptsevensum; 9999];
-                
-%             else
-                 
-%                 motorptsevensum = [motorptsevensum; sum(motorptseven)];
-                 
-%             end
-            
+            motorptsevensum = [motorptsevensum; 9999];        
         else
-            
             motorptsevensum = [motorptsevensum; sum(motorptseven)];
-            
         end
         
         mixedptsevensum = [mixedptsevensum; sum(mixedptseven)];
         
     end
     
-    if SplitHalf == 1 && MatchAcrossTasks == 1 && ConcatenateTasks == 1
-        
-        mintasksamps = min(min([memptsoddsum motorptsoddsum mixedptsoddsum memptsevensum motorptsevensum mixedptsevensum]))/3;
-    
-    elseif SplitHalf == 1
+    %%
+    %what is this doing?
+    if SplitHalf == 1
     
         mintasksamps = min(min([memptsoddsum motorptsoddsum mixedptsoddsum memptsevensum motorptsevensum mixedptsevensum]));
         
@@ -148,79 +111,59 @@ end
 for i=1:numel(subs)
     
     disp(sprintf('Creating dconn for subject %s: %s', subs{i}, datestr(now)));
-    
-    
+  
     % Initialize cat data
+    % what is cat data?
     if SplitHalf == 1
-            
     	catData1 = [];
     	catData2 = [];
-            
     else
-            
-    	catData = [];
-            
+    	catData = [];    
     end
     
     for j=1:length(tasks)
-        
     	if MatchData == 1 && SplitHalf == 1
-            
-                load (['/projects/b1081/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
-        
-                memptsodd = [];
-                motorptsodd = [];
-                mixedptsodd = [];
-                memptseven = [];
-                motorptseven = [];
-                mixedptseven = [];
-        
-                for u = 1:length(SubStruct)
-            
-                    if SubStruct(u).OddEven == 1
-                
-                        memptsodd = [memptsodd; SubStruct(u).MemSampPts];
-                        mixedptsodd = [mixedptsodd; SubStruct(u).MixedSampPts];
-                        motorptsodd = [motorptsodd SubStruct(u).MotorSampPts];
-                
-                    elseif SubStruct(u).OddEven == 2
-                
-                        memptseven = [memptseven; SubStruct(u).MemSampPts];
-                        mixedptseven = [mixedptseven; SubStruct(u).MixedSampPts];
-                        motorptseven = [motorptseven; SubStruct(u).MotorSampPts];
-      
-                    end
+            %change path to local directory containing QC files
+            load (['/projects/b1081/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
+            %why are we setting up these variables again?
+            memptsodd = [];
+            motorptsodd = [];
+            mixedptsodd = [];
+            memptseven = [];
+            motorptseven = [];
+            mixedptseven = [];
+
+            for u = 1:length(SubStruct)
+
+                if SubStruct(u).OddEven == 1
+
+                    memptsodd = [memptsodd; SubStruct(u).MemSampPts];
+                    mixedptsodd = [mixedptsodd; SubStruct(u).MixedSampPts];
+                    motorptsodd = [motorptsodd SubStruct(u).MotorSampPts];
+
+                elseif SubStruct(u).OddEven == 2
+
+                    memptseven = [memptseven; SubStruct(u).MemSampPts];
+                    mixedptseven = [mixedptseven; SubStruct(u).MixedSampPts];
+                    motorptseven = [motorptseven; SubStruct(u).MotorSampPts];
+
                 end
-            
-                if strcmp(subs{i}, 'MSC09')  %% Removes motor task from consideration for MSC09
-                
-                    minsampspts = min([sum(memptsodd) sum(mixedptsodd) sum(memptseven) sum(mixedptseven)]);
-                
-                else
-        
-                    minsampspts = min([sum(memptsodd) sum(mixedptsodd) sum(motorptsodd) sum(memptseven) sum(mixedptseven) sum(motorptseven)]);
-                
-                end
-                
-                
-            if MatchAcrossSubs == 0
-                
-                meansamppts = floor(minsampspts/5);
-                
-                disp(sprintf('For subject %s the minimum number of sample points in a split-half is %i, with a mean of %i points per sesssion: %s', subs{i}, minsampspts, meansamppts, datestr(now)));
-            
-            else
-                
-                meansamppts = floor(mintasksamps/5);
-        
-                disp(sprintf('For all subjects, the minimum number of sample points in a split-half is %i, with a mean of %i points per sesssion: %s', mintasksamps, meansamppts, datestr(now)));
-            
-                meansampptstempodd = meansamppts;
-                meansampptstempeven = meansamppts;
-            
             end
 
-            %disp(sprintf('For subject %s the minimum number of sample points in a split-half is %i, with a mean of %i points per sesssion per task for concatenation: %s', subs{i}, minsampspts, meansamppts/3, datestr(now)));
+            if strcmp(subs{i}, 'MSC09')  %% Removes motor task from consideration for MSC09, why??
+
+                minsampspts = min([sum(memptsodd) sum(mixedptsodd) sum(memptseven) sum(mixedptseven)]);
+
+            else
+
+                minsampspts = min([sum(memptsodd) sum(mixedptsodd) sum(motorptsodd) sum(memptseven) sum(mixedptseven) sum(motorptseven)]);
+
+            end
+           
+            meansamppts = floor(mintasksamps/5);
+            disp(sprintf('For all subjects, the minimum number of sample points in a split-half is %i, with a mean of %i points per sesssion: %s', mintasksamps, meansamppts, datestr(now)));
+            meansampptstempodd = meansamppts;
+            meansampptstempeven = meansamppts;
             
             if strcmp(subs{i}, 'MSC09') && strcmp(tasks{j}, 'motor') && ConcatenateTasks == 1  %% Sets motor task data points for subject MSC09
                     
@@ -234,6 +177,7 @@ for i=1:numel(subs)
                         
             end
             
+           %what are these?
            remaindertotalodd = 0;
            remaindertotaleven = 0;
            

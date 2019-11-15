@@ -22,56 +22,12 @@ AbsoluteThresholds = 0;  %% Toggles whether to use absolute or percent threshold
 
 
 if CreateVariantFiles == 1
+        
+    [task_files, subjects1, tasksplithalf] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_samedata_all_varmaps.txt','%s%s%s');
 
-    if FullMaps == 1
+    [rest_files, subjects2, restsplithalf] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_alltask_all_varmaps.txt','%s%s%s');
 
-        [task_files, subjects1, tasks1] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps.txt','%s%s%s');
-
-        [rest_files, subjects2, tasks2] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps.txt','%s%s%s');
-        
-    elseif MatchedMaps == 1 && ConsecMaps == 1 && SplitHalf == 1 && IndividTasks == 1
-        
-        [task_files, subjects1, tasksplithalf] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_task_samedata_consec_all_varmaps.txt','%s%s%s');
-
-        [rest_files, subjects2, restsplithalf] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_task_samedata_consec_all_varmaps.txt','%s%s%s');
-        
-    elseif MatchedMaps == 1 && SplitHalf == 1 && IndividTasks == 1
-        
-        [task_files, subjects1, tasksplithalf] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_task_samedata_all_varmaps.txt','%s%s%s');
-
-        [rest_files, subjects2, restsplithalf] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_task_samedata_all_varmaps.txt','%s%s%s');
-        
-    elseif MatchedMaps == 1 && ConsecMaps == 1 && SplitHalf == 1 && MatchedCatTasks == 1
-        
-        [task_files, subjects1, tasksplithalf] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_samedata_consec_all_varmaps.txt','%s%s%s');
-
-        [rest_files, subjects2, restsplithalf] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_alltask_samedata_consec_all_varmaps.txt','%s%s%s');
-        
-    elseif MatchedMaps == 1 && SplitHalf == 1 && MatchedCatTasks == 1
-        
-        [task_files, subjects1, tasksplithalf] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_samedata_all_varmaps.txt','%s%s%s');
-
-        [rest_files, subjects2, restsplithalf] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_alltask_all_varmaps.txt','%s%s%s');
-        
-    elseif MatchedMaps == 1 && SplitHalf == 1
-        
-        [task_files, subjects1, tasksplithalf] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_splithalf_matched.txt','%s%s%s');
-
-        [rest_files, subjects2, restsplithalf] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_splithalf_matched.txt','%s%s%s');
-        
-    elseif MatchedMaps == 1
-        
-        [task_files, subjects1, tasks1] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_matched.txt','%s%s%s');
-
-        [rest_files, subjects2, tasks2] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_matched.txt','%s%s%s');
-        
-    else
-        
-        [task_files, subjects1, tasks1] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_matched_rest.txt','%s%s%s');
-
-        [rest_files, subjects2, tasks2] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_matched_task.txt','%s%s%s');
-    
-    end
+end
     
     for g = 1:numel(thresholds)
         
