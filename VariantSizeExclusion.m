@@ -35,7 +35,7 @@ if CreateVariantFiles == 1
     [rest_files, subjects2, restsplithalf] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_alltask_all_varmaps.txt','%s%s%s');
 
 
-% main for-loop, 
+% main for-loop, creates variant map, excluding low signal regions
     for x = 1:length(rest_files)
 
         subject = subjects2{x};
@@ -43,22 +43,20 @@ if CreateVariantFiles == 1
         cifti_rest = ft_read_cifti_mod(rest_files{x});
         cifti_task = ft_read_cifti_mod(task_files{x}); 
 
+% if you want to exclude low signal regions, this will exclude by SNR
         if SNRexclusion == 1
-
+            %move path to top, make variable to replace (SNRPath)
             SNRmap = ft_read_cifti_mod(['/Users/briankraus/Desktop/MSC_SNR_Maps/CIFTI_Files/MSC_Template/Individual_Session_Map/' subject '/' subject '__SNRMap__AllDataConcatenated.dscalar.nii']);
-            %this is commented out in my version of the script
-            %Reliabilitymap = ft_read_cifti_mod(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Reliability_Data/WholeBrain_Reliability_Correlations/' subject '_SplitHalf_Reliability_Map_vs_' subject '_All_REST_EvenSessions_cortex_cortex_corr.dtseries.nii']);
-
+            
             SNRmap.data = SNRmap.data(1:59412,:);
             SNRexclude = find(SNRmap.data < 750);
-            %Reliabilityexclude = find(Reliabilitymap.data < .8);
 
             cifti_rest.data(SNRexclude,1) = NaN;
             cifti_task.data(SNRexclude,1) = NaN;
 
         end
 
-
+%this part makes the variant mask
         cifti_task_threshold = find(cifti_task.data < prctile(cifti_task.data,threshold));
         cifti_rest_threshold = find(cifti_rest.data < prctile(cifti_rest.data,threshold));
 
@@ -92,6 +90,7 @@ if CreateVariantFiles == 1
         strrest = ['SNRExclude_' restsplithalf{x}];
         strtask = ['SNRExclude_' tasksplithalf{x}];
 
+% move paths to top
         outfilewbtask = ['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Matched_Task_Data/TaskCat_Split_Half_Data/' subject '/' subject '_matcheddata_Variant_Size_' strtask '_' num2str(threshold) '.dtseries.nii'];
         outfilewbrest = ['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Matched_Rest_Data/TaskCat_Split_Half_Data/' subject '/' subject '_matcheddata_REST_Variant_Size_' strrest '_' num2str(threshold) '.dtseries.nii'];
 
@@ -101,6 +100,7 @@ if CreateVariantFiles == 1
         ft_write_cifti_mod(outfilerest, cifti_rest)
         ft_write_cifti_mod(outfiletask, cifti_task)
 
+% numbering variants
         system([workbenchdir 'wb_command -cifti-find-clusters ' outfilerest ' 0 0 0 0 COLUMN ' outfilewbrest ' -left-surface ' leftsurf ' -right-surface ' rightsurf])
 
         system([workbenchdir 'wb_command -cifti-find-clusters ' outfiletask ' 0 0 0 0 COLUMN ' outfilewbtask ' -left-surface ' leftsurf ' -right-surface ' rightsurf])
@@ -109,7 +109,7 @@ if CreateVariantFiles == 1
     
 end
 
-%%
+%% Take this part out and make it a function
 if ExcludeVariantSize == 1
     %change paths        
     [task_files, subjects1, thresholds1] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_splithalf_matched_variants_absolute_thresholds_SNRexclude.txt','%s%s%s');
