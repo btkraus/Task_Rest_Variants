@@ -1,4 +1,4 @@
-
+%% summary at the top, what is it doing: Makes comparisons rest-rest, task-task, rest-task. 
 clear all
 
 DiceCorr = 1;  %% Toggles whether to calculate dice correlations for all subjects
@@ -21,7 +21,7 @@ SubjectPlots = 0;  %% Toggles whether to plot subject level results
 
 AbsoluteThresholds = 0;  %% Toggles whether thresholds are absolute values or percents
 %%
-%%Do we want to leave 10 as a threshold?
+%%leave 10 
 thresholds = [2.5 10];  %% Sets the thresholds of files to load
 %%
 % Specify output directory    
@@ -116,11 +116,15 @@ nfiles = length(rest_files_even);
         cifti_rest_odd = ft_read_cifti_mod(rest_files_odd{x});
         cifti_task_odd = ft_read_cifti_mod(task_files_odd{x});
       
+      
+      % if size exclude, do stand alone function to exclude based on size (need function)
          %% Apply exclusion masks for maps that exclude size
             cifti_rest_mask_even = ft_read_cifti_mod(rest_masks_even{x});
             cifti_task_mask_even = ft_read_cifti_mod(task_masks_even{x});
             cifti_rest_mask_odd = ft_read_cifti_mod(rest_masks_odd{x});
             cifti_task_mask_odd = ft_read_cifti_mod(task_masks_odd{x});
+
+
 
             for d = 1:length(cifti_rest_mask_even.data)
                 if cifti_rest_mask_even.data(d) == 0
@@ -141,7 +145,7 @@ nfiles = length(rest_files_even);
             end
             
     
-  %% Get number of variants and mean/median size
+  %% Get number of variants and mean/median size, put it at end of variant making script
         
             vars_rest_even = unique(cifti_rest_even.data);
             vars_rest_even(1) = [];
@@ -194,7 +198,7 @@ nfiles = length(rest_files_even);
             MedianSizeVariantsTaskEvenTemp = [MedianSizeVariantsTaskEvenTemp; median(vars_task_size_even)];
             MedianSizeVariantsRestOddTemp = [MedianSizeVariantsRestOddTemp; median(vars_rest_size_odd)];
             MedianSizeVariantsRestEvenTemp = [MedianSizeVariantsRestEvenTemp; median(vars_rest_size_even)];
-        
+        %% end of descriptive stats part
        
             %% dice correlations
                 dcorrdatataskrest1 = [];
@@ -267,6 +271,7 @@ nfiles = length(rest_files_even);
             
                 end
                 
+                % if empty (due to low threshold or high size exclusion), then set dice corr to 0
                 if isempty(dcorrdatataskrest1)
                     dctaskrest1 = 0;
                 else                   
@@ -295,7 +300,7 @@ nfiles = length(rest_files_even);
                 DiceCorrsTaskTask = [DiceCorrsTaskTask; dctasktask];
                 DiceCorrsRestRest = [DiceCorrsRestRest; dcrestrest];
             
-
+%% will decide if will be included in the paper
 %         if AnyOverlap == 1
 %         
 %             if SplitHalf == 1
@@ -395,6 +400,7 @@ nfiles = length(rest_files_even);
 %             
 %             else
    
+   %%comment this out too
                 overlapvars = [];
         
                 for r = 1:length(vars_rest)
@@ -415,6 +421,7 @@ nfiles = length(rest_files_even);
 %             end
         end
 
+%%will decide if this will be included in the paper 
 %         if COMOverlap == 1
 %         
 %             if SplitHalf == 1
@@ -729,7 +736,7 @@ nfiles = length(rest_files_even);
 %         end
         
 
-%what are these variables?
+% saves SNR excluded data for each subject if you want to do permutations
       	if randomizevals == 1 || SubjectPlots == 1
             
          	if SplitHalf == 1
@@ -751,7 +758,7 @@ nfiles = length(rest_files_even);
 %     end
     
     
-     %% Add temp variables to final variables
+     %% Add temp variables to final variables, put these with descriptive stats
     
         NumVariantsTaskOdd = [NumVariantsTaskOdd NumVariantsTaskOddTemp];
         NumVariantsTaskEven = [NumVariantsTaskEven NumVariantsTaskEvenTemp];
@@ -767,7 +774,7 @@ nfiles = length(rest_files_even);
         MedianSizeVariantsRestEven = [MedianSizeVariantsRestEven MedianSizeVariantsRestEvenTemp];
     
 
-%     if randomizevals == 1
+     if randomizevals == 1
 %         
 %         if permvals == 1
 %             
