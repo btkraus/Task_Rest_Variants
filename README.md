@@ -9,7 +9,8 @@ cifti-matlab-master: https://github.com/Washington-University/cifti-matlab;
 
 Connectome workbench: https://www.humanconnectome.org/software/get-connectome-workbench;
 
-1. Create SNR Maps?
+
+1. Create SNR map: for each subject map of good signal areas (in our case these were created by identifying regions that were above 750 mean on mode 1000 normalized data). Code not provided.
 
 2.    Create variant maps using MakeTaskDconns.m and MakeTaskDconnsRestLocal.m for task and rest data, respectively. 
 
