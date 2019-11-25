@@ -1499,7 +1499,7 @@ nfiles = length(rest_files_even);
 
     if plotresults == 1
     
-       % if SubjectPlots == 1
+        if SubjectPlots == 1
         
 
 %        		if SplitHalf == 1
@@ -1554,58 +1554,58 @@ nfiles = length(rest_files_even);
                     
 %                 end
             
-           %end
+            end
         
             for z = 1:size(plotdatanull,1)
             
-%                 if SplitHalf == 1
-%                     
-%                     if AnyOverlap == 1 && COMOverlap == 1
-%             
-%                         SEplotDicewithin(z) = std([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)])/sqrt(size([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)],2));
-%                         SEplotAnywithin(z) = std([NumOverlapRestRest(z,:); NumOverlapTaskTask(z,:)])/sqrt(size([NumOverlapRestRest(z,:); NumOverlapTaskTask(z,:)],2));
-%                         SEplotCOMwithin(z) = std([COMOverlapsRestRest(z,:); COMOverlapsTaskTask(z,:)])/sqrt(size([COMOverlapsRestRest(z,:); COMOverlapsTaskTask(z,:)],2));
-%                         
-%                     elseif AnyOverlap == 1
-%                         
-%                      	SEplotDicewithin(z) = std([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)])/sqrt(size([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)],2));
-%                         SEplotAnywithin(z) = std([NumOverlapRestRest(z,:); NumOverlapTaskTask(z,:)])/sqrt(size([NumOverlapRestRest(z,:); NumOverlapTaskTask(z,:)],2));
-%                         
-%                     elseif COMOverlap == 1
-%                         
-%                         SEplotDicewithin(z) = std([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)])/sqrt(size([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)],2));
-%                         SEplotCOMwithin(z) = std([COMOverlapsRestRest(z,:); COMOverlapsTaskTask(z,:)])/sqrt(size([COMOverlapsRestRest(z,:); COMOverlapsTaskTask(z,:)],2));
-%                         
-%                     else
+                if SplitHalf == 1
+                    
+                    if AnyOverlap == 1 && COMOverlap == 1
+            
+                        SEplotDicewithin(z) = std([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)])/sqrt(size([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)],2));
+                        SEplotAnywithin(z) = std([NumOverlapRestRest(z,:); NumOverlapTaskTask(z,:)])/sqrt(size([NumOverlapRestRest(z,:); NumOverlapTaskTask(z,:)],2));
+                        SEplotCOMwithin(z) = std([COMOverlapsRestRest(z,:); COMOverlapsTaskTask(z,:)])/sqrt(size([COMOverlapsRestRest(z,:); COMOverlapsTaskTask(z,:)],2));
+                        
+                    elseif AnyOverlap == 1
+                        
+                     	SEplotDicewithin(z) = std([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)])/sqrt(size([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)],2));
+                        SEplotAnywithin(z) = std([NumOverlapRestRest(z,:); NumOverlapTaskTask(z,:)])/sqrt(size([NumOverlapRestRest(z,:); NumOverlapTaskTask(z,:)],2));
+                        
+                    elseif COMOverlap == 1
+                        
+                        SEplotDicewithin(z) = std([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)])/sqrt(size([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)],2));
+                        SEplotCOMwithin(z) = std([COMOverlapsRestRest(z,:); COMOverlapsTaskTask(z,:)])/sqrt(size([COMOverlapsRestRest(z,:); COMOverlapsTaskTask(z,:)],2));
+                        
+                    else
                         
                         SEplotDicewithin(z) = std([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)])/sqrt(size([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)],2));
                         
-%                     end
-%             
-%                 end
+                    end
+            
+                end
                 
-%                 if AnyOverlap == 1 && COMOverlap == 1
-%                 
-%                     SEplotDicenull(z) = std(SubjectDiceCorrs(z,:))/sqrt(size(SubjectDiceCorrs(z,:),2));
-%                     SEplotAnynull(z) = std(SubjectNumOverlap(z,:))/sqrt(size(SubjectNumOverlap(z,:),2));
-%                     SEplotCOMnull(z) = std(SubjectCOMOverlap(z,:))/sqrt(size(SubjectCOMOverlap(z,:),2));
-%                     
-%                 elseif AnyOverlap == 1
-%             
-%                     SEplotDicenull(z) = std(SubjectDiceCorrs(z,:))/sqrt(size(SubjectDiceCorrs(z,:),2));
-%                     SEplotAnynull(z) = std(SubjectNumOverlap(z,:))/sqrt(size(SubjectNumOverlap(z,:),2));
-%                     
-%                 elseif COMOverlap == 1
-%                     
-%                     SEplotDicenull(z) = std(SubjectDiceCorrs(z,:))/sqrt(size(SubjectDiceCorrs(z,:),2));
-%                     SEplotCOMnull(z) = std(SubjectCOMOverlap(z,:))/sqrt(size(SubjectCOMOverlap(z,:),2));
-%                     
-%                 else
+                if AnyOverlap == 1 && COMOverlap == 1
+                
+                    SEplotDicenull(z) = std(SubjectDiceCorrs(z,:))/sqrt(size(SubjectDiceCorrs(z,:),2));
+                    SEplotAnynull(z) = std(SubjectNumOverlap(z,:))/sqrt(size(SubjectNumOverlap(z,:),2));
+                    SEplotCOMnull(z) = std(SubjectCOMOverlap(z,:))/sqrt(size(SubjectCOMOverlap(z,:),2));
+                    
+                elseif AnyOverlap == 1
+            
+                    SEplotDicenull(z) = std(SubjectDiceCorrs(z,:))/sqrt(size(SubjectDiceCorrs(z,:),2));
+                    SEplotAnynull(z) = std(SubjectNumOverlap(z,:))/sqrt(size(SubjectNumOverlap(z,:),2));
+                    
+                elseif COMOverlap == 1
                     
                     SEplotDicenull(z) = std(SubjectDiceCorrs(z,:))/sqrt(size(SubjectDiceCorrs(z,:),2));
-%                     
-%                 end
-%             end
+                    SEplotCOMnull(z) = std(SubjectCOMOverlap(z,:))/sqrt(size(SubjectCOMOverlap(z,:),2));
+                    
+                else
+                    
+                    SEplotDicenull(z) = std(SubjectDiceCorrs(z,:))/sqrt(size(SubjectDiceCorrs(z,:),2));
+                    
+                end
+            end
             
             for f = 1:3     %% Loops over Dice, Any overlap, and COM overlap
             
