@@ -1496,7 +1496,8 @@ nfiles = length(rest_files_even);
 %     end
 
 
-
+%% plot results
+%haven't started working on this part
     if plotresults == 1
     
        % if SubjectPlots == 1
