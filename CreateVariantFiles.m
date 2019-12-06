@@ -19,9 +19,6 @@ outfilepath = '/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Matched_T
 %%
 threshold = 2.5;  %% Thresholds used to calculate variants (lowest % or correlation values)
 SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR
-MatchedMaps = 1;  %% Toggles whether to use the most task/rest data from the subject with the least amount of data
-MatchedCatTasks = 1; %% Toggles whether to use files that are combined and matched to individual tasks
-SplitHalf = 1;  %% Toggles whether to use split-half data
 
 %%
     % reads file paths, sub numbers split-halves from txt files    
