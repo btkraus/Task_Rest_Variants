@@ -1,6 +1,3 @@
-%% things to address
-%Reliability maps and reliability exclusions
-
 
 clear all
 

@@ -1,7 +1,12 @@
+%%Questions: Have you decided if will include AnyOverlap or COMOverlap in
+%%paper? Do I leave the option SubjectPlots? Do I keep the code for making a bar
+%%graph? (line 1750)
+
+
 %% QuantifyVariantOverlap.m 
 %This script compares variant locations between rest-rest, task-task, rest-task
 %It makes plots that quantify how much they overlap between conditions
-%Written by Brian Kraus. Edited by Diana Perez
+%Written by Brian Kraus. Edited by Diana Perez.
 
 clear all
 
@@ -95,15 +100,12 @@ for v = 1:numel(thresholds)
         DiceCorrsTaskRest = [];
         DiceCorrsTaskTask = [];
         DiceCorrsRestRest = [];
-        
-        
-        
-       
+     
     end
 
   
 
-% sets up number of files
+% sets up number of files for for-loop
 nfiles = length(rest_files_even);
     
   
@@ -119,7 +121,7 @@ nfiles = length(rest_files_even);
         cifti_task_odd = ft_read_cifti_mod(task_files_odd{x});
       
       
-      % if size exclude, do stand alone function to exclude based on size (need function)
+  
          %% Apply exclusion masks for maps that exclude size
             cifti_rest_mask_even = ft_read_cifti_mod(rest_masks_even{x});
             cifti_task_mask_even = ft_read_cifti_mod(task_masks_even{x});
@@ -738,7 +740,7 @@ nfiles = length(rest_files_even);
 %         end
         
 
-% saves SNR excluded data for each subject if you want to do permutations
+        % saves SNR excluded data for each subject if you want to do permutations
       	if randomizevals == 1 || SubjectPlots == 1
             
          	if SplitHalf == 1
@@ -1587,7 +1589,9 @@ nfiles = length(rest_files_even);
 %                         SEplotCOMwithin(z) = std([COMOverlapsRestRest(z,:); COMOverlapsTaskTask(z,:)])/sqrt(size([COMOverlapsRestRest(z,:); COMOverlapsTaskTask(z,:)],2));
 %                         
 %                     else
-                        
+                        %%
+                        %Gets standard error of dice correlations within
+                        %??? subjects?
                         SEplotDicewithin(z) = std([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)])/sqrt(size([DiceCorrsRestRest(z,:); DiceCorrsTaskTask(z,:)],2));
                         
 %                     end
@@ -1617,6 +1621,8 @@ nfiles = length(rest_files_even);
 %                 end
 %             end
             
+%%
+%what is this??
             for f = 1:3     %% Loops over Dice, Any overlap, and COM overlap
             
                 if f == 1       %% Plot Dice
@@ -1636,7 +1642,7 @@ nfiles = length(rest_files_even);
                 
                 end
         
-        
+  %%      
                 %%% Plot Dice correlations by subject
                 
                 if f == 1 || (f == 2 && AnyOverlap == 1) || (f == 3 && COMOverlap == 1)
@@ -1684,55 +1690,55 @@ nfiles = length(rest_files_even);
             
                     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
                 
-                    if MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1 && AbsoluteThresholds == 1
-                    
-                        filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_SNRAndSizeExclude_' num2str(thresholds(v)) '_Abs.jpg'];
-                
-                    elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1
+%                     if MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1 && AbsoluteThresholds == 1
+%                     
+%                         filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_SNRAndSizeExclude_' num2str(thresholds(v)) '_Abs.jpg'];
+%                 
+%                     elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1
         
                         filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_SNRAndSizeExclude_' num2str(thresholds(v)) '_Percent.jpg'];
         
-                    elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1
-        
-                        filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_SNRAndSizeExclude.jpg'];
-                        
-                    elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1
-        
-                        filename = ['/BySubjectPlots_' fstring '_MatchedData_Overlap_SNRAndSizeExclude.jpg'];
-                    
-                    elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1 && AbsoluteThresholds == 1
-                    
-                        filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_SNRExclude_' num2str(thresholds(v)) '_Abs.jpg'];
-                    
-                    elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1
-        
-                        filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_SNRExclude_' num2str(thresholds(v)) '_Percent.jpg'];
-        
-                    elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1
-        
-                        filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_SNRExclude.jpg'];
-                            
-                    elseif MatchedMaps == 1 && SNRExclude == 1
-        
-                        filename = ['/BySubjectPlots_' fstring '_MatchedData_Overlap_SNRExclude.jpg'];
-        
-                    elseif MatchedMaps == 1 && SizeExclude == 1 && SplitHalf == 1
-        
-                        filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_SizeExclude.jpg'];
-                            
-                    elseif MatchedMaps == 1 && SizeExclude == 1
-        
-                        filename = ['/BySubjectPlots_' fstring '_MatchedData_Overlap_SizeExclude.jpg'];
-                
-                    elseif MatchedMaps == 1 && SplitHalf == 1
-        
-                        filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_NoExclude.jpg'];    
-        
-                    else
-        
-                        filename = ['/BySubjectPlots_' fstring '_MatchedData_Overlap_NoExclude.jpg'];
-                            
-                    end
+%                     elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1
+%         
+%                         filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_SNRAndSizeExclude.jpg'];
+%                         
+%                     elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1
+%         
+%                         filename = ['/BySubjectPlots_' fstring '_MatchedData_Overlap_SNRAndSizeExclude.jpg'];
+%                     
+%                     elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1 && AbsoluteThresholds == 1
+%                     
+%                         filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_SNRExclude_' num2str(thresholds(v)) '_Abs.jpg'];
+%                     
+%                     elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1
+%         
+%                         filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_SNRExclude_' num2str(thresholds(v)) '_Percent.jpg'];
+%         
+%                     elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1
+%         
+%                         filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_SNRExclude.jpg'];
+%                             
+%                     elseif MatchedMaps == 1 && SNRExclude == 1
+%         
+%                         filename = ['/BySubjectPlots_' fstring '_MatchedData_Overlap_SNRExclude.jpg'];
+%         
+%                     elseif MatchedMaps == 1 && SizeExclude == 1 && SplitHalf == 1
+%         
+%                         filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_SizeExclude.jpg'];
+%                             
+%                     elseif MatchedMaps == 1 && SizeExclude == 1
+%         
+%                         filename = ['/BySubjectPlots_' fstring '_MatchedData_Overlap_SizeExclude.jpg'];
+%                 
+%                     elseif MatchedMaps == 1 && SplitHalf == 1
+%         
+%                         filename = ['/BySubjectPlots_' fstring '_MatchedData_SplitHalf_Overlap_NoExclude.jpg'];    
+%         
+%                     else
+%         
+%                         filename = ['/BySubjectPlots_' fstring '_MatchedData_Overlap_NoExclude.jpg'];
+%                             
+%                     end
                     
                     saveas(gcf,[outputdir filename])
     
@@ -1741,355 +1747,358 @@ nfiles = length(rest_files_even);
                 end
             end
         end
+    %% for making a bar graph
+%         if BarGraph == 1
+%     
+%             if randomizevals == 1
+%                 
+%                 if AnyOverlap == 1 && COMOverlap == 1
+%         
+%                     simplotdata = [DiceCorrspval NumOverlappval COMOverlapspval];
+%                     
+%                 elseif AnyOverlap == 1
+%                     
+%                     simplotdata = [DiceCorrspval NumOverlappval];
+%                     
+%                 elseif COMOverlap == 1
+%                     
+%                     simplotdata = [DiceCorrspval COMOverlapspval];
+%                     
+%                 else
+%                     
+%                     simplotdata = DiceCorrspval;
+%                     
+%                 end
+% 
+%             end
+%     
+%             if SplitHalf == 1
+%                 
+%                 if AnyOverlap == 1 && COMOverlap == 1
+%         
+%                     plotdata = [DiceCorrsTaskRest NumOverlapTaskRest COMOverlapsTaskRest];
+%                     plotdata2 = [[DiceCorrsTaskTask;DiceCorrsRestRest] [NumOverlapTaskTask;NumOverlapRestRest] [COMOverlapsTaskTask;COMOverlapsRestRest]];
+%                     
+%                 elseif AnyOverlap == 1
+%                     
+%                     plotdata = [DiceCorrsTaskRest NumOverlapTaskRest];
+%                     plotdata2 = [[DiceCorrsTaskTask;DiceCorrsRestRest] [NumOverlapTaskTask;NumOverlapRestRest]];
+%                     
+%                 elseif COMOverlap == 1
+%                     
+%                     plotdata = [DiceCorrsTaskRest COMOverlapsTaskRest];
+%                     plotdata2 = [[DiceCorrsTaskTask;DiceCorrsRestRest] [COMOverlapsTaskTask;COMOverlapsRestRest]];
+%                     
+%                 else
+%                     
+%                     plotdata = DiceCorrsTaskRest;
+%                     plotdata2 = [DiceCorrsTaskTask;DiceCorrsRestRest];
+%                     
+%                 end
+%         
+%             else
+%                 
+%                 if AnyOverlap == 1 && COMOverlap == 1
+%     
+%                     plotdata = [DiceCorrs NumOverlap COMOverlaps];
+%                     
+%                 elseif AnyOverlap == 1
+%                     
+%                     plotdata = [DiceCorrs NumOverlap];
+%                     
+%                 elseif COMOverlap == 1
+%                     
+%                     plotdata = [DiceCorrs COMOverlaps];
+%                     
+%                 else
+%                     
+%                     plotdata = DiceCorrs;
+%                     
+%                 end
+%     
+%             end
+%     
+%             for z = 1:size(plotdata,2)
+%         
+%                 if SplitHalf == 1
+%             
+%                     SEplot(z) = std(plotdata(:,z))/sqrt(size(plotdata,1));
+%                     SEplot2(z) = std(plotdata2(:,z))/sqrt(size(plotdata2,1));
+%             
+%                 else
+% 
+%                     SEplot(z) = std(plotdata(:,z))/sqrt(size(plotdata,1));
+%                         
+%                 end
+%             end
+%             
+%             if AnyOverlap == 1 && COMOverlap == 1
+%                 
+%                 xlabels = {'Dice Correlations', 'Any Overlap', 'COM Overlap'};
+%                 
+%             elseif AnyOverlap == 1
+%                 
+%                 xlabels = {'Dice Correlations', 'Any Overlap'};
+%                 
+%             elseif COMOverlap == 1
+%                 
+%                 xlabels = {'Dice Correlations', 'COM Overlap'};
+%                 
+%             else
+%                 
+%                 xlabels = {'Dice Correlations'};
+%                 
+%             end
+%     
+%             if SplitHalf == 1
+%                 
+%                 bar(categorical(xlabels), mean(plotdata2,1), 'FaceColor', 'w', 'EdgeColor', 'g');
+%                	hold on
+%                	errorbar(categorical(xlabels),mean(plotdata2,1),SEplot2,'.');
+%              	hold on
+%                     
+%             end
+% 
+%           	bar(categorical(xlabels), mean(plotdata,1), 'FaceColor', 'w');
+%          	hold on
+%           	errorbar(categorical(xlabels),mean(plotdata,1),SEplot,'.');
+%           	hold on
+% 
+%             if randomizevals == 1
+% 
+%              	bar(categorical(xlabels), simplotdata, 'FaceColor', 'k');
+%                	hold on
+%                     
+%             end
+%       
+%             plot(categorical(xlabels), plotdata(9,:), '.', 'MarkerSize', 15, 'color', [1, 0.5, 0]);
+%             hold on
+%             plot(categorical(xlabels), plotdata(8,:), '.', 'MarkerSize', 15, 'color', [0, 0.6, 0.6]);
+%             hold on    
+%             plot(categorical(xlabels), plotdata(7,:), '.', 'MarkerSize', 15, 'color', [1, 0, 1]);
+%             hold on
+%             plot(categorical(xlabels), plotdata(6,:), '.', 'MarkerSize', 15, 'color', [0.2, 1, 1]);
+%             hold on
+%             plot(categorical(xlabels), plotdata(5,:), '.', 'MarkerSize', 15, 'color', [0, 0, 1]);
+%             hold on
+%             plot(categorical(xlabels), plotdata(4,:), '.', 'MarkerSize', 15, 'color', [1, 0, 0]);
+%             hold on
+%             plot(categorical(xlabels), plotdata(3,:), '.', 'MarkerSize', 15, 'color', [0, 1, 0]);
+%             hold on
+%             plot(categorical(xlabels), plotdata(2,:), '.', 'MarkerSize', 15, 'color', [0.9, 0.9, 0]);
+%             hold on
+%             plot(categorical(xlabels), plotdata(1,:), '.', 'MarkerSize', 15, 'color', [0, 0, 0]);
+%             hold on
+%     
+%             ylim([0 1]);
+%                 
+%             if FullMaps == 1
+%                 
+%                 title(['All Subjects Variant Overlap Unmatched Data'], 'fontsize',18)
+%                     
+%             elseif MatchedMaps == 1
+%                     
+%                 title(['All Subjects Variant Overlap Matched Data'], 'fontsize',18)
+%                     
+%             end
+%                 
+%             h = findobj(gca,'Type','line');
+% 
+%             legendpos = 'SouthEast';
+%                 
+%             legend(h(1:9), 'MSC01', 'MSC02', 'MSC03', 'MSC04', 'MSC05', 'MSC06', 'MSC07', 'MSC09', 'MSC10', 'Location', legendpos)
+%     
+%             if FullMaps == 1
+%         
+%                 filename = '/AllSubjects_AllData_Overlap_SNRExclude.jpg';
+%         
+%                 if randomizevals == 1
+%             
+%                     filename = strrep(filename, '.jpg', '_pvals.jpg');
+%             
+%                 end
+%                 
+%             elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1 && AbsoluteThresholds == 1
+%                 
+%                 filename = ['/AllSubjects_MatchedData_SplitHalf_Overlap_SNRAndSizeExclude_' num2str(thresholds(v)) '_Abs.jpg'];
+%         
+%                 if randomizevals == 1
+%             
+%                     filename = strrep(filename, '.jpg', '_pvals.jpg');
+%             
+%                 end
+%                 
+%             elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1
+%         
+%                 filename = ['/AllSubjects_MatchedData_SplitHalf_Overlap_SNRAndSizeExclude_' num2str(thresholds(v)) '_Percent.jpg'];
+%         
+%                 if randomizevals == 1
+%             
+%                     filename = strrep(filename, '.jpg', '_pvals.jpg');
+%             
+%                 end
+%                 
+%             elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1
+%         
+%                 filename = '/AllSubjects_MatchedData_SplitHalf_Overlap_SNRAndSizeExclude.jpg';
+%         
+%                 if randomizevals == 1
+%             
+%                     filename = strrep(filename, '.jpg', '_pvals.jpg');
+%             
+%                 end
+%                             
+%                 saveas(gcf,[outputdir filename])
+%                         
+%             elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1
+%         
+%                 filename = '/AllSubjects_MatchedData_Overlap_SNRAndSizeExclude.jpg';
+%         
+%                 if randomizevals == 1
+%             
+%                     filename = strrep(filename, '.jpg', '_pvals.jpg');
+%             
+%                 end
+%                             
+%                 saveas(gcf,[outputdir filename])
+%                 
+%             elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1 && AbsoluteThresholds == 1
+%         
+%                 filename = ['/AllSubjects_MatchedData_SplitHalf_Overlap_SNRExclude_' num2str(thresholds(v)) '_Abs.jpg'];
+%         
+%                 if randomizevals == 1
+%             
+%                     filename = strrep(filename, '.jpg', '_pvals.jpg');
+%             
+%                 end
+%                 
+%             elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1
+%         
+%                 filename = ['/AllSubjects_MatchedData_SplitHalf_Overlap_SNRExclude_' num2str(thresholds(v)) '_Percent.jpg'];
+%         
+%                 if randomizevals == 1
+%             
+%                     filename = strrep(filename, '.jpg', '_pvals.jpg');
+%             
+%                 end
+%         
+%             elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1
+%         
+%                 filename = '/AllSubjects_MatchedData_SplitHalf_Overlap_SNRExclude.jpg';
+%         
+%                 if randomizevals == 1
+%             
+%                     filename = strrep(filename, '.jpg', '_pvals.jpg');
+%             
+%                 end
+%                             
+%             elseif MatchedMaps == 1 && SNRExclude == 1
+%         
+%                 filename = '/AllSubjects_MatchedData_Overlap_SNRExclude.jpg';
+%         
+%                 if randomizevals == 1
+%             
+%                     filename = strrep(filename, '.jpg', '_pvals.jpg');
+%             
+%                 end
+%         
+%             elseif MatchedMaps == 1 && SizeExclude == 1 && SplitHalf == 1
+%         
+%                 filename = '/AllSubjects_MatchedData_SplitHalf_Overlap_SizeExclude.jpg';
+%         
+%                 if randomizevals == 1
+%             
+%                     filename = strrep(filename, '.jpg', '_pvals.jpg');
+%             
+%                 end
+%                             
+%             elseif MatchedMaps == 1 && SizeExclude == 1
+%         
+%                 filename = '/AllSubjects_MatchedData_Overlap_SizeExclude.jpg';
+%         
+%                 if randomizevals == 1
+%             
+%                     filename = strrep(filename, '.jpg', '_pvals.jpg');
+%             
+%                 end
+%         
+%             else
+%         
+%                 filename = '/AllSubjects_MatchedData_Overlap_NoExclude.jpg';
+%         
+%                 if randomizevals == 1
+%             
+%                     filename = strrep(filename, '.jpg', '_pvals.jpg');
+%             
+%                 end
+%                             
+%             end
+%             
+%             if AnyOverlap == 1 && COMOverlap == 1
+%                 
+%                 saveas(gcf,[outputdir filename])
+%                 
+%             else
+%                 
+%                 filename = strrep(filename, '.jpg', '_DiceOnly.jpg');
+% 
+%                 saveas(gcf,[outputdir filename])
+%                 
+%             end
+%     
+%             close gcf
+%         
+%         end
+    % end bar graph
     
-        if BarGraph == 1
-    
-            if randomizevals == 1
-                
-                if AnyOverlap == 1 && COMOverlap == 1
-        
-                    simplotdata = [DiceCorrspval NumOverlappval COMOverlapspval];
-                    
-                elseif AnyOverlap == 1
-                    
-                    simplotdata = [DiceCorrspval NumOverlappval];
-                    
-                elseif COMOverlap == 1
-                    
-                    simplotdata = [DiceCorrspval COMOverlapspval];
-                    
-                else
-                    
-                    simplotdata = DiceCorrspval;
-                    
-                end
-
-            end
-    
-            if SplitHalf == 1
-                
-                if AnyOverlap == 1 && COMOverlap == 1
-        
-                    plotdata = [DiceCorrsTaskRest NumOverlapTaskRest COMOverlapsTaskRest];
-                    plotdata2 = [[DiceCorrsTaskTask;DiceCorrsRestRest] [NumOverlapTaskTask;NumOverlapRestRest] [COMOverlapsTaskTask;COMOverlapsRestRest]];
-                    
-                elseif AnyOverlap == 1
-                    
-                    plotdata = [DiceCorrsTaskRest NumOverlapTaskRest];
-                    plotdata2 = [[DiceCorrsTaskTask;DiceCorrsRestRest] [NumOverlapTaskTask;NumOverlapRestRest]];
-                    
-                elseif COMOverlap == 1
-                    
-                    plotdata = [DiceCorrsTaskRest COMOverlapsTaskRest];
-                    plotdata2 = [[DiceCorrsTaskTask;DiceCorrsRestRest] [COMOverlapsTaskTask;COMOverlapsRestRest]];
-                    
-                else
-                    
-                    plotdata = DiceCorrsTaskRest;
-                    plotdata2 = [DiceCorrsTaskTask;DiceCorrsRestRest];
-                    
-                end
-        
-            else
-                
-                if AnyOverlap == 1 && COMOverlap == 1
-    
-                    plotdata = [DiceCorrs NumOverlap COMOverlaps];
-                    
-                elseif AnyOverlap == 1
-                    
-                    plotdata = [DiceCorrs NumOverlap];
-                    
-                elseif COMOverlap == 1
-                    
-                    plotdata = [DiceCorrs COMOverlaps];
-                    
-                else
-                    
-                    plotdata = DiceCorrs;
-                    
-                end
-    
-            end
-    
-            for z = 1:size(plotdata,2)
-        
-                if SplitHalf == 1
-            
-                    SEplot(z) = std(plotdata(:,z))/sqrt(size(plotdata,1));
-                    SEplot2(z) = std(plotdata2(:,z))/sqrt(size(plotdata2,1));
-            
-                else
-
-                    SEplot(z) = std(plotdata(:,z))/sqrt(size(plotdata,1));
-                        
-                end
-            end
-            
-            if AnyOverlap == 1 && COMOverlap == 1
-                
-                xlabels = {'Dice Correlations', 'Any Overlap', 'COM Overlap'};
-                
-            elseif AnyOverlap == 1
-                
-                xlabels = {'Dice Correlations', 'Any Overlap'};
-                
-            elseif COMOverlap == 1
-                
-                xlabels = {'Dice Correlations', 'COM Overlap'};
-                
-            else
-                
-                xlabels = {'Dice Correlations'};
-                
-            end
-    
-            if SplitHalf == 1
-                
-                bar(categorical(xlabels), mean(plotdata2,1), 'FaceColor', 'w', 'EdgeColor', 'g');
-               	hold on
-               	errorbar(categorical(xlabels),mean(plotdata2,1),SEplot2,'.');
-             	hold on
-                    
-            end
-
-          	bar(categorical(xlabels), mean(plotdata,1), 'FaceColor', 'w');
-         	hold on
-          	errorbar(categorical(xlabels),mean(plotdata,1),SEplot,'.');
-          	hold on
-
-            if randomizevals == 1
-
-             	bar(categorical(xlabels), simplotdata, 'FaceColor', 'k');
-               	hold on
-                    
-            end
-      
-            plot(categorical(xlabels), plotdata(9,:), '.', 'MarkerSize', 15, 'color', [1, 0.5, 0]);
-            hold on
-            plot(categorical(xlabels), plotdata(8,:), '.', 'MarkerSize', 15, 'color', [0, 0.6, 0.6]);
-            hold on    
-            plot(categorical(xlabels), plotdata(7,:), '.', 'MarkerSize', 15, 'color', [1, 0, 1]);
-            hold on
-            plot(categorical(xlabels), plotdata(6,:), '.', 'MarkerSize', 15, 'color', [0.2, 1, 1]);
-            hold on
-            plot(categorical(xlabels), plotdata(5,:), '.', 'MarkerSize', 15, 'color', [0, 0, 1]);
-            hold on
-            plot(categorical(xlabels), plotdata(4,:), '.', 'MarkerSize', 15, 'color', [1, 0, 0]);
-            hold on
-            plot(categorical(xlabels), plotdata(3,:), '.', 'MarkerSize', 15, 'color', [0, 1, 0]);
-            hold on
-            plot(categorical(xlabels), plotdata(2,:), '.', 'MarkerSize', 15, 'color', [0.9, 0.9, 0]);
-            hold on
-            plot(categorical(xlabels), plotdata(1,:), '.', 'MarkerSize', 15, 'color', [0, 0, 0]);
-            hold on
-    
-            ylim([0 1]);
-                
-            if FullMaps == 1
-                
-                title(['All Subjects Variant Overlap Unmatched Data'], 'fontsize',18)
-                    
-            elseif MatchedMaps == 1
-                    
-                title(['All Subjects Variant Overlap Matched Data'], 'fontsize',18)
-                    
-            end
-                
-            h = findobj(gca,'Type','line');
-
-            legendpos = 'SouthEast';
-                
-            legend(h(1:9), 'MSC01', 'MSC02', 'MSC03', 'MSC04', 'MSC05', 'MSC06', 'MSC07', 'MSC09', 'MSC10', 'Location', legendpos)
-    
-            if FullMaps == 1
-        
-                filename = '/AllSubjects_AllData_Overlap_SNRExclude.jpg';
-        
-                if randomizevals == 1
-            
-                    filename = strrep(filename, '.jpg', '_pvals.jpg');
-            
-                end
-                
-            elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1 && AbsoluteThresholds == 1
-                
-                filename = ['/AllSubjects_MatchedData_SplitHalf_Overlap_SNRAndSizeExclude_' num2str(thresholds(v)) '_Abs.jpg'];
-        
-                if randomizevals == 1
-            
-                    filename = strrep(filename, '.jpg', '_pvals.jpg');
-            
-                end
-                
-            elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1
-        
-                filename = ['/AllSubjects_MatchedData_SplitHalf_Overlap_SNRAndSizeExclude_' num2str(thresholds(v)) '_Percent.jpg'];
-        
-                if randomizevals == 1
-            
-                    filename = strrep(filename, '.jpg', '_pvals.jpg');
-            
-                end
-                
-            elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1
-        
-                filename = '/AllSubjects_MatchedData_SplitHalf_Overlap_SNRAndSizeExclude.jpg';
-        
-                if randomizevals == 1
-            
-                    filename = strrep(filename, '.jpg', '_pvals.jpg');
-            
-                end
-                            
-                saveas(gcf,[outputdir filename])
-                        
-            elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1
-        
-                filename = '/AllSubjects_MatchedData_Overlap_SNRAndSizeExclude.jpg';
-        
-                if randomizevals == 1
-            
-                    filename = strrep(filename, '.jpg', '_pvals.jpg');
-            
-                end
-                            
-                saveas(gcf,[outputdir filename])
-                
-            elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1 && AbsoluteThresholds == 1
-        
-                filename = ['/AllSubjects_MatchedData_SplitHalf_Overlap_SNRExclude_' num2str(thresholds(v)) '_Abs.jpg'];
-        
-                if randomizevals == 1
-            
-                    filename = strrep(filename, '.jpg', '_pvals.jpg');
-            
-                end
-                
-            elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1
-        
-                filename = ['/AllSubjects_MatchedData_SplitHalf_Overlap_SNRExclude_' num2str(thresholds(v)) '_Percent.jpg'];
-        
-                if randomizevals == 1
-            
-                    filename = strrep(filename, '.jpg', '_pvals.jpg');
-            
-                end
-        
-            elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1
-        
-                filename = '/AllSubjects_MatchedData_SplitHalf_Overlap_SNRExclude.jpg';
-        
-                if randomizevals == 1
-            
-                    filename = strrep(filename, '.jpg', '_pvals.jpg');
-            
-                end
-                            
-            elseif MatchedMaps == 1 && SNRExclude == 1
-        
-                filename = '/AllSubjects_MatchedData_Overlap_SNRExclude.jpg';
-        
-                if randomizevals == 1
-            
-                    filename = strrep(filename, '.jpg', '_pvals.jpg');
-            
-                end
-        
-            elseif MatchedMaps == 1 && SizeExclude == 1 && SplitHalf == 1
-        
-                filename = '/AllSubjects_MatchedData_SplitHalf_Overlap_SizeExclude.jpg';
-        
-                if randomizevals == 1
-            
-                    filename = strrep(filename, '.jpg', '_pvals.jpg');
-            
-                end
-                            
-            elseif MatchedMaps == 1 && SizeExclude == 1
-        
-                filename = '/AllSubjects_MatchedData_Overlap_SizeExclude.jpg';
-        
-                if randomizevals == 1
-            
-                    filename = strrep(filename, '.jpg', '_pvals.jpg');
-            
-                end
-        
-            else
-        
-                filename = '/AllSubjects_MatchedData_Overlap_NoExclude.jpg';
-        
-                if randomizevals == 1
-            
-                    filename = strrep(filename, '.jpg', '_pvals.jpg');
-            
-                end
-                            
-            end
-            
-            if AnyOverlap == 1 && COMOverlap == 1
-                
-                saveas(gcf,[outputdir filename])
-                
-            else
-                
-                filename = strrep(filename, '.jpg', '_DiceOnly.jpg');
-
-                saveas(gcf,[outputdir filename])
-                
-            end
-    
-            close gcf
-        
-        end
+    %%
     
         if BoxPlot == 1
             
-      	if SplitHalf == 1
-                
-         	if AnyOverlap == 1 && COMOverlap == 1
-        
-             	plotdata = [DiceCorrsTaskRest NumOverlapTaskRest COMOverlapsTaskRest];
-             	plotdata2 = [[DiceCorrsTaskTask;DiceCorrsRestRest] [NumOverlapTaskTask;NumOverlapRestRest] [COMOverlapsTaskTask;COMOverlapsRestRest]];
-                    
-          	elseif AnyOverlap == 1
-                    
-              	plotdata = [DiceCorrsTaskRest NumOverlapTaskRest];
-            	plotdata2 = [[DiceCorrsTaskTask;DiceCorrsRestRest] [NumOverlapTaskTask;NumOverlapRestRest]];
-                    
-            elseif COMOverlap == 1
-                    
-             	plotdata = [DiceCorrsTaskRest COMOverlapsTaskRest];
-              	plotdata2 = [[DiceCorrsTaskTask;DiceCorrsRestRest] [COMOverlapsTaskTask;COMOverlapsRestRest]];
-                    
-            else
-                    
+%       	if SplitHalf == 1
+%                 
+%          	if AnyOverlap == 1 && COMOverlap == 1
+%         
+%              	plotdata = [DiceCorrsTaskRest NumOverlapTaskRest COMOverlapsTaskRest];
+%              	plotdata2 = [[DiceCorrsTaskTask;DiceCorrsRestRest] [NumOverlapTaskTask;NumOverlapRestRest] [COMOverlapsTaskTask;COMOverlapsRestRest]];
+%                     
+%           	elseif AnyOverlap == 1
+%                     
+%               	plotdata = [DiceCorrsTaskRest NumOverlapTaskRest];
+%             	plotdata2 = [[DiceCorrsTaskTask;DiceCorrsRestRest] [NumOverlapTaskTask;NumOverlapRestRest]];
+%                     
+%             elseif COMOverlap == 1
+%                     
+%              	plotdata = [DiceCorrsTaskRest COMOverlapsTaskRest];
+%               	plotdata2 = [[DiceCorrsTaskTask;DiceCorrsRestRest] [COMOverlapsTaskTask;COMOverlapsRestRest]];
+%                     
+%             else
+%                     
              	plotdata = DiceCorrsTaskRest;
              	plotdata2 = [DiceCorrsTaskTask;DiceCorrsRestRest];
                     
-            end
-        
-        else
-                
-         	if AnyOverlap == 1 && COMOverlap == 1
-    
-             	plotdata = [DiceCorrs NumOverlap COMOverlaps];
-                    
-        	elseif AnyOverlap == 1
-                    
-             	plotdata = [DiceCorrs NumOverlap];
-                    
-          	elseif COMOverlap == 1
-                    
-                plotdata = [DiceCorrs COMOverlaps];
-                    
-            else
-                    
-             	plotdata = DiceCorrs;
-                    
-            end
-        end
+%             end
+%         
+%         else
+%                 
+%          	if AnyOverlap == 1 && COMOverlap == 1
+%     
+%              	plotdata = [DiceCorrs NumOverlap COMOverlaps];
+%                     
+%         	elseif AnyOverlap == 1
+%                     
+%              	plotdata = [DiceCorrs NumOverlap];
+%                     
+%           	elseif COMOverlap == 1
+%                     
+%                 plotdata = [DiceCorrs COMOverlaps];
+%                     
+%             else
+%                     
+%              	plotdata = DiceCorrs;
+%                     
+%             end
+%         end
         
             if randomizevals == 1
                 

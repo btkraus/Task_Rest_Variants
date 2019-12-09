@@ -102,3 +102,4 @@ SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR
 
     end
 
+ExcludeVariantSize(rest_files, task_files, subjects2, theshold)

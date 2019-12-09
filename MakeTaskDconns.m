@@ -2,6 +2,7 @@ parpool('local', 28) %% Name of cluster profile for batch job, how many workers 
 
 clear all
 
+cd '/projects/b1081';   %% Change CD to root project directory
 outdir = '/projects/b1081/Brian_MSC/dconn_task_files';%change this to your output directory
 dataLocStem = '/MSC/TaskFC/';%directory where the data are located
 subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC09','MSC10'};
@@ -20,7 +21,6 @@ ConcatenateSplitHalf = 0;  %% Toggles whether to concatenate split halves into o
 SaveTimeseries = 1;     %% Save concatenated timeseries for subject
 
 
-cd '/projects/b1081';   %% Change CD to root project directory
 
 disp(sprintf('Job Submitted: %s', datestr(now)));
 disp(sprintf('Job Started: %s', datestr(now)));
