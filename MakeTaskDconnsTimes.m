@@ -428,7 +428,7 @@ for i=1:numel(subs)
 
         elseif SplitHalf == 0 || ConcatenateSplitHalf == 1
 
-            disp(sprintf('Running Correlations: %s', datestr(now)));
+            disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData,1), size(catData,2), datestr(now)));
             template.data = paircorr_mod(catData');
             catData = [];
 
@@ -477,8 +477,6 @@ for i=1:numel(subs)
             createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template2.data, outputfile2)
             
         elseif MakeVariantMap == 1
-            
-            disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData,1), size(catData,2), datestr(now)));
             
             createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template.data, outputfile)
             
