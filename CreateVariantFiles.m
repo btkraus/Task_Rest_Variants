@@ -18,7 +18,7 @@ outfilepath = '/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Matched_T
 
 %%
 threshold = 2.5;  %% Thresholds used to calculate variants (lowest % or correlation values)
-SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR
+SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR, 1 = exclude, 0 = don't exclude
 
 %%
     % reads file paths, sub numbers split-halves from txt files    
@@ -79,6 +79,13 @@ SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR
             end
         end
         %%
+        
+        if ExcludeBySize = 1 
+            
+            [cifti_rest.data, cifti_task.data] = ExcludeVariantSize(cifti_rest_final_dat, cifti_task_final_dat, subject, theshold);
+            
+        end 
+        
         %This creates the output file names for rest and task 
         outfilerest = strrep(rest_files{x}, 'vs_120_allsubs_corr_cortex_corr', ['ThresholdedVariantMap_SNRExclude_' num2str(threshold)]);
         outfiletask = strrep(task_files{x}, 'cortex_vs_120_allsubs_corr_cortex_corr', ['ThresholdedVariantMap_SNRExclude_' num2str(threshold)]);
@@ -89,12 +96,12 @@ SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR
         outfilewbrest = [outfilepath subject '/' subject '_matcheddata_REST_Variant_Size_' strrest '_' num2str(threshold) '.dtseries.nii'];
 
         %this creates and writes the file in cifti format
-        cifti_rest.data = cifti_rest_final_dat;
-        cifti_task.data = cifti_task_final_dat;
-
+%         cifti_rest.data = cifti_rest_final_dat;
+%         cifti_task.data = cifti_task_final_dat;
+        
         ft_write_cifti_mod(outfilerest, cifti_rest)
         ft_write_cifti_mod(outfiletask, cifti_task)
-
+        
         % This numbers that variants, clustering adjacent vertices that =1
         % together and assigning each cluster a number
         system([workbenchdir 'wb_command -cifti-find-clusters ' outfilerest ' 0 0 0 0 COLUMN ' outfilewbrest ' -left-surface ' leftsurf ' -right-surface ' rightsurf])
@@ -102,4 +109,3 @@ SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR
 
     end
 
-ExcludeVariantSize(rest_files, task_files, subjects2, theshold)

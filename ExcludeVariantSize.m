@@ -1,15 +1,11 @@
-%This function excludes variants that are less than 15 adjacent vertices
-%big. Written by Brian Kraus. Edited by Diana Perez. 
+function [cifti_rest.data, cifti_task.data] = ExcludeVariantSize(cifti_rest.data, cifti_task.data, subject, threshold)
 
-
-function ExcludeVariantSize(rest_files, task_files, subjects2, threshold)
+    %This function excludes variants that are less than 15 adjacent vertices
+    %big. Written by Brian Kraus. Edited by Diana Perez.     
     
-    for x = 1:length(rest_files)
-
-        subject = subjects2{x};
-        
-        cifti_rest = ft_read_cifti_mod(rest_files{x});
-        cifti_task = ft_read_cifti_mod(task_files{x});
+    
+        %minimum number of vertices required for variant
+        ExclusionCriteria = 15;
         
         rest_sizes = [];
         task_sizes = [];
@@ -90,15 +86,7 @@ function ExcludeVariantSize(rest_files, task_files, subjects2, threshold)
                 
             end
         end
+ end
         
-        
-        %sets file name    
-        outfilerest = strrep(rest_files{x}, 'SNRExclude', ['SNRExclude_SizeExclude_' num2str(threshold)]);
-        outfiletask = strrep(task_files{x}, 'SNRExclude', ['SNRExclude_SizeExclude_' num2str(threshold)]);
 
-        %writes file in cifti format
-        ft_write_cifti_mod(outfilerest, cifti_rest)
-        ft_write_cifti_mod(outfiletask, cifti_task)
         
-        
-    end
