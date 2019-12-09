@@ -1,10 +1,11 @@
 function [cifti_rest.data, cifti_task.data] = ExcludeVariantSize(cifti_rest.data, cifti_task.data, subject, threshold)
 
     %This function excludes variants that are less than 15 adjacent vertices
-    %big. Written by Brian Kraus. Edited by Diana Perez.     
+    %big. WRITE DESCRITION OF INPUTS AND OUTPUTS WITH SOME DETAILS OF WHAT FORMAT OF INPUTS IS SUPPOSED TO BE
+    %. Written by Brian Kraus. Edited by Diana Perez.     
     
     
-        %minimum number of vertices required for variant
+        %minimum number of vertices required for variant; MAKE THIS ONE OF THE INPUTS
         ExclusionCriteria = 15;
         
         rest_sizes = [];
