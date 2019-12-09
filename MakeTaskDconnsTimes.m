@@ -1,4 +1,4 @@
-parpool('local', 24)     %% Name of cluster profile for batch job
+%parpool('local', 24)     %% Name of cluster profile for batch job
 
 %/davta/vnil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_motor_passvv2/
 %/data/nil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_mem_pass2/
@@ -94,15 +94,16 @@ for i=1:numel(subs)
 
                     if SubStruct(u).OddEven == 1 && (enoughptsmem == 0 && maxptsmem == 0)
                             
-                        if SubStruct(u).RestSampPts + ptscountmem >= tasksamppts + remaindertaskpts
+                        if SubStruct(u).MemSampPts + ptscountmem >= tasksamppts + remaindertaskpts
                             
                             sampspersessionmem(u) = sampspersessionmem(u) + (tasksamppts - ptscountmem);
-                            ptscountmem = 1;
+                            ptscountmem = sampspersessionmem(u) + ptscountmem;
+                            enoughptsmem = 1;
                             
-                        elseif SubStruct(u).RestSampPts + ptscountmem < tasksamppts + remaindertaskpts
+                        elseif SubStruct(u).MemSampPts + ptscountmem < tasksamppts + remaindertaskpts
                             
-                            sampspersessionmem(u) = sampspersessionmem(u) + SubStruct(u).RestSampPts;
-                            ptscountmem = SubStruct(u).RestSampPts + ptscountmem;
+                            sampspersessionmem(u) = sampspersessionmem(u) + SubStruct(u).MemSampPts;
+                            ptscountmem = SubStruct(u).MemSampPts + ptscountmem;
                                 
                         end
                         
@@ -116,15 +117,16 @@ for i=1:numel(subs)
                     
                     if SubStruct(u).OddEven == 1 && enoughptsmixed == 0
                     
-                        if SubStruct(u).RestSampPts + ptscountmixed >= tasksamppts + remaindertaskpts
+                        if SubStruct(u).MixedSampPts + ptscountmixed >= tasksamppts + remaindertaskpts
                             
                             sampspersessionmixed(u) = sampspersessionmixed(u) + (tasksamppts - ptscountmixed);
+                            ptscountmixed = sampspersessionmixed(u) + ptscountmixed;
                             enoughptsmixed = 1;
                             
-                        elseif SubStruct(u).RestSampPts + ptscountmixed < tasksamppts + remaindertaskpts
+                        elseif SubStruct(u).MixedSampPts + ptscountmixed < tasksamppts + remaindertaskpts
                             
-                            sampspersessionmixed(u) = sampspersessionmixed(u) + SubStruct(u).RestSampPts;
-                            ptscountmixed = SubStruct(u).RestSampPts + ptscountmixed;
+                            sampspersessionmixed(u) = sampspersessionmixed(u) + SubStruct(u).MixedSampPts;
+                            ptscountmixed = SubStruct(u).MixedSampPts + ptscountmixed;
                                 
                         end
                         
@@ -138,15 +140,16 @@ for i=1:numel(subs)
                     
                     if SubStruct(u).OddEven == 1 && enoughptsmotor == 0
                     
-                        if SubStruct(u).RestSampPts + ptscountmotor >= tasksamppts + remaindertaskpts
+                        if SubStruct(u).MotorSampPts + ptscountmotor >= tasksamppts + remaindertaskpts
                             
                             sampspersessionmotor(u) = sampspersessionmotor(u) + (tasksamppts - ptscountmotor);
+                            ptscountmotor = sampspersessionmotor(u) + ptscountmotor;
                             enoughptsmotor = 1;
                             
-                        elseif SubStruct(u).RestSampPts + ptscountmotor < tasksamppts + remaindertaskpts
+                        elseif SubStruct(u).MotorSampPts + ptscountmotor < tasksamppts + remaindertaskpts
                             
-                            sampspersessionmotor(u) = sampspersessionmotor(u) + SubStruct(u).RestSampPts;
-                            ptscountmotor = SubStruct(u).RestSampPts + ptscountmotor;
+                            sampspersessionmotor(u) = sampspersessionmotor(u) + SubStruct(u).MotorSampPts;
+                            ptscountmotor = SubStruct(u).MotorSampPts + ptscountmotor;
                                 
                         end
                         
