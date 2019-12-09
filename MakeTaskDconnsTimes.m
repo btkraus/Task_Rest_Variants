@@ -1,4 +1,4 @@
-%parpool('local', 24)     %% Name of cluster profile for batch job
+parpool('local', 24)     %% Name of cluster profile for batch job
 
 %/davta/vnil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_motor_passvv2/
 %/data/nil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_mem_pass2/
@@ -275,11 +275,23 @@ for i=1:numel(subs)
                     data = ft_read_cifti_mod([MSCciftidir '/' vcids{k} '_LR_surf_subcort_333_32k_fsLR_smooth2.55.dtseries.nii']);
                     data = data.data;
                     if strcmp(tasks{j},'motor')
+                        
                         tmask = TIndFin(k).AllMotor;
+                        
+                        sampspersession = sampspersessionmotor(k);
+                        
                     elseif strcmp(tasks{j},'mem')
+                        
                         tmask = TIndFin(k).AllMem;
+                        
+                        sampspersession = sampspersessionmem(k);
+                        
                     else
+                        
                         tmask = TIndFin(k).AllGlass + TIndFin(k).AllSemantic;
+                        
+                        sampspersession = sampspersessionmixed(k);
+                        
                     end
 
                     if sum(tmask) == 0      % Skip file if no task task data
@@ -289,7 +301,7 @@ for i=1:numel(subs)
                         
                     elseif ConsecSample == 1 && numel(times) > 1
                         
-                     	tmasknum = sampspersession(k);
+                     	tmasknum = sampspersession;
                             
                       	if tmasknum > 0
                                 
