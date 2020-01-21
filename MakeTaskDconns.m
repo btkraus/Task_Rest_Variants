@@ -8,7 +8,8 @@ dataLocStem = '/MSC/TaskFC/';%directory where the data are located
 subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC09','MSC10'};
 tasks = {'motor','mem','mixed'};
 
-CortexOnly = 1; %% Toggles whether to run correlations on cortex only
+%leave uncommented options in the script
+%CortexOnly = 1; %% Toggles whether to run correlations on cortex only
 SplitHalf = 1;  %% Toggles whether to create a separate file for odd/even sessions
 MatchData = 1; %% Toggles whether to match the amount of data per task as the lowest value within each split-half
 RandSample = 1; %% Toggles whether to randomly sample data from each session
@@ -17,7 +18,7 @@ MatchAcrossTasks = 0;  %% Toggles whether to match the amount of data across tas
 ConcatenateTasks = 1;   %% Toggles whether to concatenate data for all tasks
 MakeDconn = 0;  %% Toggles whether to write a dconn
 MakeVariantMap = 1; %% Toggles whether to write a variant map
-ConcatenateSplitHalf = 0;  %% Toggles whether to concatenate split halves into one vector
+%ConcatenateSplitHalf = 0;  %% Toggles whether to concatenate split halves into one vector
 SaveTimeseries = 1;     %% Save concatenated timeseries for subject
 
 

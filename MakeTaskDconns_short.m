@@ -215,12 +215,14 @@ for i=1:numel(subs)
         
         %% ARE THE DATALIST files included in the MSC data download or do we have to include something in the read-me about making these txt files?
         % Load vcids (session identifiers for current subject)
+        %DATALIST is in the WashU download - txt file with one line per
+        %session
         MSCTaskdir = strcat(cd, dataLocStem);
         [~,vcids,~,~,~] = textread([MSCTaskdir '/' subs{i} '_' tasks{j} '_DATALIST.txt'],'%s%s%s%s%s');
         
         disp(sprintf('%i sessions found for subject %s task %s: %s', size(vcids,1), subs{i}, tasks{j}, datestr(now)));
         
-        %% Why is it different for MSC03 and MSC10? 
+        %% Why is it different for MSC03 and MSC10?, filtered for respiration, ref. CG's paper
         % Load tmasks
         if strcmp(subs{i}, 'MSC03') || strcmp(subs{i}, 'MSC10')
         	MSCcondidir = strcat(strcat(MSCTaskdir, '/'), ['FCProc_' subs{i} '_' tasks{j} '_pass2_FDfilt/']);
@@ -228,7 +230,8 @@ for i=1:numel(subs)
             MSCcondidir = strcat(strcat(MSCTaskdir, '/'), ['FCProc_' subs{i} '_' tasks{j} '_pass2/']);   
         end
          
-        %what are condindices.mat files?
+        %what are condindices.mat files? mask that combines motion and task
+        %info to only take task periods with low motion
         load ([MSCcondidir 'condindices.mat']);
 
         % Load and concatentate data
@@ -285,7 +288,9 @@ for i=1:numel(subs)
     
     
     if SaveTimeseries == 1          %% Save concatenated FC processed timeseries       
-        %% WILL THE TEMPLATE ALWAYS BE MSC01? I NEED TO MOVE THIS PATH TO THE TOP BUT FIRST FIGURE OUT HOW TO SET THIS UP       
+        %% WILL THE TEMPLATE ALWAYS BE MSC01? I NEED TO MOVE THIS PATH TO THE TOP BUT FIRST FIGURE OUT HOW TO SET THIS UP    
+        % surface version of data for MSC01 - any dtseries template can
+        % work here
         timseriestemplate = ft_read_cifti_mod('/projects/b1081/Brian_MSC/Analysis_Scripts_Replication/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
         timseriestemplate.data = [];        
         timseriestemplate.data = catData;
@@ -325,7 +330,7 @@ for i=1:numel(subs)
             disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData1,1), size(catData1,2), datestr(now)));
             template.data = paircorr_mod(catData1');            
             catData1 = [];           
-            %% NEED TO FIND THIS FUNCTION (CAN'T FIND IN PROJECT DIRECTORY) AND PUT PATHS AT THE TOP
+            %% NEED TO FIND THIS FUNCTION (CAN'T FIND IN PROJECT DIRECTORY) AND PUT PATHS AT THE TOP - look for it in Brian_MSC folder
             createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/projects/b1081/Brian_MSC/Analysis_Scripts_Replication/output_files/variant_maps',template.data, outputfile1)            
             template.data = [];            
             disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData2,1), size(catData2,2), datestr(now)));
@@ -334,7 +339,7 @@ for i=1:numel(subs)
             createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/projects/b1081/Brian_MSC/Analysis_Scripts_Replication/output_files/variant_maps',template2.data, outputfile2)            
             template2.data = [];        
             %% What is the difference between this and the one above????
-        else            
+        else   %% combine with if statement above          
             createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/projects/b1081/Brian_MSC/Analysis_Scripts_Replication/output_files/variant_maps',template.data, outputfile1)            
             createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/projects/b1081/Brian_MSC/Analysis_Scripts_Replication/output_files/variant_maps',template2.data, outputfile2)            
         end
