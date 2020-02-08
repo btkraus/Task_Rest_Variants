@@ -1,6 +1,7 @@
-% What does this script do? 
+% This script makes Dconns (if the MakeDconn variable = 1) and variant files
+% (if VariantMap = 1)for each subject's even and odd sessions. 
 % QC files need to be named [subject]_QCFile.mat, ex. 'MSC01_QCFile.mat'
-% Written by Brian Kraus, edited by Diana Perez, January 2020.
+% Written by Brian Kraus, edited by Diana Perez.
 
 parpool('local', 28)     %% Name of cluster profile for batch job (how many workers/cores you need to run this job)
 
@@ -15,9 +16,8 @@ dataLocStem = '/MSC/TaskFC/'; %specify location of data
 QCFiles_path = '/projects/b1081/Brian_MSC/Analysis_Scripts_Replication/QC_files/';
 cd '/projects/b1081';   %% Change CD to root project directory
 %% 
-%CortexOnly = 1; %% Toggles whether to run correlations on cortex only
-%SplitHalf = 1;  %% Toggles whether to create a separate file for odd/even sessions
-%MatchData = 1; %% Toggles whether to match the amount of data per task as the lowest value within each split-half
+SplitHalf = 1;  %% Toggles whether to create a separate file for odd/even sessions
+MatchData = 1; %% Toggles whether to match the amount of data per task as the lowest value within each split-half
 %MatchAcrossSubs = 1;  %% Toggles whether to match the amount of data across subjects
 %ConcatenateTasks = 1;   %% Toggles whether to concatenate data for all tasks
 MakeDconn = 0;  %% Toggles whether to write a dconn
@@ -44,8 +44,7 @@ mixedptsevensum = [];
 %     for n=1:numel(subs)
 %         load ([QCFiles_path subs{n} '_QCFile.mat']);
 %         
-%         % sets up variables for number of sample points available for
-%         % current subject
+%         
 %         memptsodd = [];
 %         motorptsodd = [];
 %         mixedptsodd = [];

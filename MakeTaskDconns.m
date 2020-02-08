@@ -1,15 +1,20 @@
-parpool('local', 28) %% Name of cluster profile for batch job, how many workers are allocated to perform this job
+% This script makes Dconns (if the MakeDconn variable = 1) and variant files
+% (if VariantMap = 1)for each subject's even and odd sessions. 
+% QC files need to be named [subject]_QCFile.mat, ex. 'MSC01_QCFile.mat'
+% Written by Brian Kraus, edited by Diana Perez.
+
+parpool('local', 28)     %% Name of cluster profile for batch job (how many workers/cores you need to run this job)
 
 clear all
 
-cd '/projects/b1081';   %% Change CD to root project directory
-outdir = '/projects/b1081/Brian_MSC/dconn_task_files';%change this to your output directory
-dataLocStem = '/MSC/TaskFC/';%directory where the data are located
-subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC09','MSC10'};
-tasks = {'motor','mem','mixed'};
+disp(sprintf('Job Submitted: %s', datestr(now)));
 
-%leave uncommented options in the script
-%CortexOnly = 1; %% Toggles whether to run correlations on cortex only
+%% Paths
+outdir = '/projects/b1081/Brian_MSC/Analysis_Scripts_Replication/dconn_task_files'; %specify output directory
+dataLocStem = '/MSC/TaskFC/'; %specify location of data
+QCFiles_path = '/projects/b1081/Brian_MSC/Analysis_Scripts_Replication/QC_files/';
+cd '/projects/b1081';   %% Change CD to root project directory
+%% Options
 SplitHalf = 1;  %% Toggles whether to create a separate file for odd/even sessions
 MatchData = 1; %% Toggles whether to match the amount of data per task as the lowest value within each split-half
 RandSample = 1; %% Toggles whether to randomly sample data from each session
@@ -18,19 +23,23 @@ MatchAcrossTasks = 0;  %% Toggles whether to match the amount of data across tas
 ConcatenateTasks = 1;   %% Toggles whether to concatenate data for all tasks
 MakeDconn = 0;  %% Toggles whether to write a dconn
 MakeVariantMap = 1; %% Toggles whether to write a variant map
-%ConcatenateSplitHalf = 0;  %% Toggles whether to concatenate split halves into one vector
 SaveTimeseries = 1;     %% Save concatenated timeseries for subject
+%% Variables
+subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC09','MSC10'};
+tasks = {'motor','mem','mixed'};
+voxnum = 59412; % number of voxels for template
 
-
-
-disp(sprintf('Job Submitted: %s', datestr(now)));
+% sets up variables for number of sample points in even- and odd-numbered
+% sessions to be used later
+memptsoddsum = [];
+motorptsoddsum = [];
+mixedptsoddsum = [];
+memptsevensum = [];
+motorptsevensum = [];
+mixedptsevensum = [];
+%% Start analysis
 disp(sprintf('Job Started: %s', datestr(now)));
 
-if CortexOnly == 1      %% Select correct number of voxels for template
-    voxnum = 59412;
-else
-    voxnum = 65625;
-end
 %%
 %%What are these variables? What is the difference between these and the
 %%variables in the for loop below
@@ -41,11 +50,13 @@ if MatchData == 1 && MatchAcrossSubs == 1
    	memptsevensum = [];
    	motorptsevensum = [];
    	mixedptsevensum = [];
-
+% This for-loop determines the number of sample points for each task and for odd- and even-numbered sessions separately
     for n=1:numel(subs)
-        %change path to local directory where QC files are located
-        load (['/projects/b1081/Brian_MSC/QC_files/' subs{n} '_QCFile.mat']);
         
+        load ([QCFiles_path subs{n} '_QCFile.mat']); %load QC files for each subject
+        
+        % sets up variables for number of sample points available for
+        % current subject
         memptsodd = [];
         motorptsodd = [];
         mixedptsodd = [];
@@ -53,13 +64,16 @@ if MatchData == 1 && MatchAcrossSubs == 1
         motorptseven = [];
         mixedptseven = [];
         
-        %What is this for loop doing? Getting values for the variables
-        %above from QC files, but what are these variables?
+         % QC files contain SubStruct with # of sample points for each task
+         % and whether the session is an even- or odd-numbered session
         for u = 1:length(SubStruct)
+            
+            % divides sample points for even and odd sessions
+            % 1 = Odd Session, 2 = Even Session
             if SubStruct(u).OddEven == 1
                 memptsodd = [memptsodd; SubStruct(u).MemSampPts];
                 mixedptsodd = [mixedptsodd; SubStruct(u).MixedSampPts];
-                if ~strcmp(subs{n}, 'MSC09')
+                if ~strcmp(subs{n}, 'MSC09') % different for MSC09 because not enough motor sample points
                     motorptsodd = [motorptsodd; SubStruct(u).MotorSampPts];
                 end
             elseif SubStruct(u).OddEven == 2
@@ -73,24 +87,20 @@ if MatchData == 1 && MatchAcrossSubs == 1
         end
     
         memptsoddsum = [memptsoddsum; sum(memptsodd)];
-        
-        %Why does MSC09 get dealt with differently? Not enough motor data?
-        if strcmp(subs{n}, 'MSC09')
-            motorptsoddsum = [motorptsoddsum; 9999];
-        else
-            motorptsoddsum = [motorptsoddsum; sum(motorptsodd)];
-        end
-        
         mixedptsoddsum = [mixedptsoddsum; sum(mixedptsodd)];
         memptsevensum = [memptsevensum; sum(memptseven)];
+        mixedptsevensum = [mixedptsevensum; sum(mixedptseven)];
         
+        % sums all sample points for all even- or odd-numbered sessions for
+        % current subject
         if strcmp(subs{n}, 'MSC09')
-            motorptsevensum = [motorptsevensum; 9999];        
+            motorptsoddsum = [motorptsoddsum; 9999];
+            motorptsevensum = [motorptsevensum; 9999];
         else
+            motorptsoddsum = [motorptsoddsum; sum(motorptsodd)];
             motorptsevensum = [motorptsevensum; sum(motorptseven)];
         end
-        
-        mixedptsevensum = [mixedptsevensum; sum(mixedptseven)];
+
         
     end
     
@@ -114,7 +124,6 @@ for i=1:numel(subs)
     disp(sprintf('Creating dconn for subject %s: %s', subs{i}, datestr(now)));
   
     % Initialize cat data
-    % what is cat data?
     if SplitHalf == 1
     	catData1 = [];
     	catData2 = [];
@@ -124,8 +133,8 @@ for i=1:numel(subs)
     
     for j=1:length(tasks)
     	if MatchData == 1 && SplitHalf == 1
-            %change path to local directory containing QC files
-            load (['/projects/b1081/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
+
+            load ([QCFiles_path subs{i} '_QCFile.mat']);
             %why are we setting up these variables again?
             memptsodd = [];
             motorptsodd = [];

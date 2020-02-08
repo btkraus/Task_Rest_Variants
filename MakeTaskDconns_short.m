@@ -5,7 +5,7 @@
 
 % This script makes Dconns and variant files for each subject's even and odd sessions. 
 % QC files need to be named [subject]_QCFile.mat, ex. 'MSC01_QCFile.mat'
-% Written by Brian Kraus, edited by Diana Perez, January 2020.
+% Written by Brian Kraus, edited by Diana Perez.
 
 parpool('local', 28)     %% Name of cluster profile for batch job (how many workers/cores you need to run this job)
 
