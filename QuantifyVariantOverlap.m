@@ -74,8 +74,6 @@ for v = 1:numel(thresholds)
         alltaskfilestaskodd = [];
         alltaskfilesresteven = [];
         alltaskfilesrestodd = [];
-        
-       
 
         % specify .txt files 
         [task_files_even, ~, ~] = textread([dirpath 'MSC_task_varmaps_' num2str(thresholds(v)) '_splithalf_even_matched_variants_SNRexclude.txt'],'%s%s%s');
@@ -93,8 +91,6 @@ for v = 1:numel(thresholds)
         [task_masks_odd, sub1, t1] = textread([dirpath 'MSC_alltask_varmaps_' num2str(thresholds(v)) '_splithalf_odd_matched_variants_SNRexclude_sizeexclude.txt'],'%s%s%s');
 
         [rest_masks_odd, sub2, t2] = textread([dirpath 'MSC_rest_varmaps_' num2str(thresholds(v)) '_splithalf_odd_matched_variants_SNRexclude_sizeexclude.txt'],'%s%s%s');
-        
- 
 
         % create temp variables for dice correlations
         DiceCorrsTaskRest = [];
@@ -103,12 +99,9 @@ for v = 1:numel(thresholds)
      
     end
 
-  
-
 % sets up number of files for for-loop
 nfiles = length(rest_files_even);
     
-  
 
     for x = 1:nfiles
 
@@ -120,15 +113,11 @@ nfiles = length(rest_files_even);
         cifti_rest_odd = ft_read_cifti_mod(rest_files_odd{x});
         cifti_task_odd = ft_read_cifti_mod(task_files_odd{x});
       
-      
-  
          %% Apply exclusion masks for maps that exclude size
             cifti_rest_mask_even = ft_read_cifti_mod(rest_masks_even{x});
             cifti_task_mask_even = ft_read_cifti_mod(task_masks_even{x});
             cifti_rest_mask_odd = ft_read_cifti_mod(rest_masks_odd{x});
             cifti_task_mask_odd = ft_read_cifti_mod(task_masks_odd{x});
-
-
 
             for d = 1:length(cifti_rest_mask_even.data)
                 if cifti_rest_mask_even.data(d) == 0
@@ -2657,11 +2646,7 @@ nfiles = length(rest_files_even);
             end
     
             close gcf
-        
-        
-        end
-                    
-    end
-    
+                
+        end                    
+    end    
 end
-    

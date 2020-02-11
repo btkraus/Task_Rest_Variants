@@ -489,8 +489,14 @@ for i=1:numel(subs)
             minsampspts = min([sum(memptsodd) sum(mixedptsodd) sum(motorptsodd) sum(memptseven) sum(mixedptseven) sum(motorptseven)]);
         end
 
-        % Get final count for task data per session
         meansamppts = round(minsampspts/5);
+
+        % Get final count for task data per session
+
+        %meansampptstempodd = round(meansamppts/3);
+        %meansampptstempeven = round(meansamppts/3);
+
+
 
         disp(sprintf('For subject %s the minimum number of sample points in a split-half is %i, with a mean of %i points per sesssion per task for concatenation: %s', subs{i}, minsampspts, round(meansamppts/3), datestr(now)));
 

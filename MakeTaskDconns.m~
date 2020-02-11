@@ -560,9 +560,8 @@ for i=1:numel(subs)
         catData = [];    
     end
     
-    % writes Dconn output files and creates output file names for variant
-    % maps
     if SplitHalf == 1 && ConcatenateTasks == 1 && MatchData == 1 && MatchAcrossSubs == 1 && RandSample == 1        
+        % writes Dconn output file
         if MakeDconn == 1             
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_matcheddata_Final_allTaskCat_OddSessions_cortex'], datestr(now)));
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_matcheddata_Final_allTaskCat_OddSessions_cortex'],template)
@@ -571,11 +570,14 @@ for i=1:numel(subs)
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_matcheddata_Final_allTaskCat_EvenSessions_cortex'],template2)        
         end
         
+        % creates output file names for variant maps
         if MakeVariantMap == 1            
             outputfile1 = [subs{i} '_matcheddata_Final_allTaskCat_EvenSessions_cortex'];
             outputfile2 = [subs{i} '_matcheddata_Final_allTaskCat_OddSessions_cortex'];            
-        end    
-    elseif SplitHalf == 1 && ConcatenateTasks == 1 && MatchData == 1 && RandSample == 1
+        end
+    
+    elseif SplitHalf == 1 && ConcatenateTasks == 1 && CortexOnly == 1 && MatchData == 1 && RandSample == 1
+        % writes Dconn output file
         if MakeDconn == 1             
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_matcheddata_allTaskCat_OddSessions_cortex'], datestr(now)));
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_matcheddata_allTaskCat_OddSessions_cortex'],template)
@@ -584,11 +586,14 @@ for i=1:numel(subs)
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_matcheddata_allTaskCat_EvenSessions_cortex'],template2)        
         end
         
+        % creates output file names for variant maps
         if MakeVariantMap == 1            
             outputfile1 = [subs{i} '_matcheddata_allTaskCat_EvenSessions_cortex'];
             outputfile2 = [subs{i} '_matcheddata_allTaskCat_OddSessions_cortex'];            
         end               
-    elseif SplitHalf == 1 && ConcatenateTasks == 1 && MatchData == 1        
+    elseif SplitHalf == 1 && ConcatenateTasks == 1 && MatchData == 1
+        
+        %writes Dconn output file
         if MakeDconn == 1             
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_matcheddata_Consec_allTaskCat_OddSessions_cortex'], datestr(now)));
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_matcheddata_Consec_allTaskCat_OddSessions_cortex'],template)
@@ -597,112 +602,231 @@ for i=1:numel(subs)
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_matcheddata_Consec_allTaskCat_EvenSessions_cortex'],template2)        
         end
         
+        % creates output file name for variant maps
         if MakeVariantMap == 1            
             outputfile1 = [subs{i} '_matcheddata_Consec_allTaskCat_EvenSessions_cortex'];
             outputfile2 = [subs{i} '_matcheddata_Consec_allTaskCat_OddSessions_cortex'];            
         end        
-    elseif SplitHalf == 1 && ConcatenateTasks == 1 && MatchData == 1 && ConcatenateSplitHalf == 1 && RandSample == 1        
+    elseif SplitHalf == 1 && ConcatenateTasks == 1 && MatchData == 1 && ConcatenateSplitHalf == 1 && RandSample == 1
+        
+        % writes Dconn output file
         if MakeDconn == 1         
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_matcheddata_allTaskCat_cortex_Rand'], datestr(now)));
             ft_write_cifti_mod([outdir '/' subs{i} '_matcheddata_allTaskCat_cortex_Rand'],template)        
         end
         
-        if MakeVariantMap == 1            
-            outputfile = [subs{i} '_matcheddata_allTaskCat_cortex_Rand'];            
-        end    
-    elseif SplitHalf == 1 && ConcatenateTasks == 1 && ConcatenateSplitHalf == 0 && RandSample == 1        
-        if MakeDconn == 1             
+        %
+        if MakeVariantMap == 1
+            
+            outputfile = [subs{i} '_matcheddata_allTaskCat_cortex_Rand'];
+            
+        end
+    
+    elseif SplitHalf == 1 && ConcatenateTasks == 1 && CortexOnly == 1 && ConcatenateSplitHalf == 0 && RandSample == 1
+        
+        if MakeDconn == 1 
+            
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_allTaskCat_OddSessions_cortex'], datestr(now)));
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_allTaskCat_OddSessions_cortex'],template)
         
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_allTaskCat_EvenSessions_cortex'], datestr(now)));
-            ft_write_cifti_mod(['/' outdir '/' subs{i} '_allTaskCat_EvenSessions_cortex'],template2)        
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_allTaskCat_EvenSessions_cortex'],template2)
+        
         end
         
-        if MakeVariantMap == 1            
+        if MakeVariantMap == 1
+            
             outputfile1 = [subs{i} '_allTaskCat_EvenSessions_cortex'];
-            outputfile2 = [subs{i} '_allTaskCat_OddSessions_cortex'];            
-        end    
-    elseif ConcatenateTasks == 1 && RandSample == 1    
-        if MakeDconn == 1         
+            outputfile2 = [subs{i} '_allTaskCat_OddSessions_cortex'];
+            
+        end
+    
+    elseif ConcatenateTasks == 1 && CortexOnly == 1 && RandSample == 1
+    
+        if MakeDconn == 1 
+        
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_allTaskCat_cortex'], datestr(now)));
-            ft_write_cifti_mod([outdir '/' subs{i} '_allTaskCat_cortex'],template)        
+            ft_write_cifti_mod([outdir '/' subs{i} '_allTaskCat_cortex'],template)
+        
         end
         
-        if MakeVariantMap == 1            
-            outputfile = [subs{i} '_allTaskCat_cortex'];            
-        end        
-    elseif SplitHalf == 1 && MatchData == 1 && RandSample == 1        
-        if MakeDconn == 1             
+        if MakeVariantMap == 1
+            
+            outputfile = [subs{i} '_allTaskCat_cortex'];
+            
+        end
+        
+    elseif ConcatenateTasks == 1 && RandSample == 1
+        
+        if MakeDconn == 1 
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_allTaskCat_subcort'], datestr(now)));
+            ft_write_cifti_mod([outdir '/' subs{i} '_allTaskCat_subcort'],template)
+        
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile = [subs{i} '_allTaskCat_subcort'];
+            
+        end
+        
+    elseif SplitHalf == 1 && CortexOnly == 1 && MatchData == 1 && RandSample == 1
+        
+        if MakeDconn == 1 
+            
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_matcheddata_OddSessions_cortex'], datestr(now)));
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_matcheddata_OddSessions_cortex'],template)
         
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_matcheddata_EvenSessions_cortex'], datestr(now)));
-            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_matcheddata_EvenSessions_cortex'],template2)        
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_matcheddata_EvenSessions_cortex'],template2)
+        
         end
         
-        if MakeVariantMap == 1            
+        if MakeVariantMap == 1
+            
             outputfile1 = [subs{i} '_' tasks{j} '_matcheddata_EvenSessions_cortex'];
-            outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_OddSessions_cortex'];            
-        end             
-    elseif SplitHalf == 1 && MatchData == 1        
-        if MakeDconn == 1             
+            outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_OddSessions_cortex'];
+            
+        end
+        
+    elseif SplitHalf == 1 && CortexOnly == 1 && MatchData == 1 && numel(subs) == 8
+        
+        if MakeDconn == 1 
+            
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_OddSessions_cortex'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_OddSessions_cortex'],template)
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_EvenSessions_cortex'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_EvenSessions_cortex'],template2)
+        
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile1 = [subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_EvenSessions_cortex'];
+            outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_OddSessions_cortex'];
+            
+        end
+        
+    elseif SplitHalf == 1 && CortexOnly == 1 && MatchData == 1
+        
+        if MakeDconn == 1 
+            
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_matcheddata_Consec_OddSessions_cortex'], datestr(now)));
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_matcheddata_Consec_OddSessions_cortex'],template)
         
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_matcheddata_Consec_EvenSessions_cortex'], datestr(now)));
-            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_matcheddata_Consec_EvenSessions_cortex'],template2)        
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_matcheddata_Consec_EvenSessions_cortex'],template2)
+        
         end
         
-        if MakeVariantMap == 1            
+        if MakeVariantMap == 1
+            
             outputfile1 = [subs{i} '_' tasks{j} '_matcheddata_Consec_EvenSessions_cortex'];
-            outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_Consec_OddSessions_cortex'];            
-        end        
-    elseif SplitHalf == 1 && RandSample == 1        
-        if MakeDconn == 1             
+            outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_Consec_OddSessions_cortex'];
+            
+        end
+        
+    elseif SplitHalf == 1 && CortexOnly == 1 && RandSample == 1
+        
+        if MakeDconn == 1 
+            
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_OddSessions_cortex'], datestr(now)));
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_OddSessions_cortex'],template)
         
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_EvenSessions_cortex'], datestr(now)));
-            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_EvenSessions_cortex'],template2)        
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_EvenSessions_cortex'],template2)
+        
         end
         
-        if MakeVariantMap == 1            
-            outputfile1 = [subs{i} '_' tasks{j} '_EvenSessions_cortex'];
-            outputfile2 = [subs{i} '_' tasks{j} '_OddSessions_cortex'];           
-        end
-    elseif RandSample == 1        
-        if MakeDconn == 1         
-            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_AllSessions_cortex'], datestr(now)));
-            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_AllSessions_cortex'],template)            
-        end
-        
-        if MakeVariantMap == 1            
-            outputfile = [subs{i} '_' tasks{j} '_AllSessions_cortex'];            
-        end        
-    end
-        %% is this where it starts running correlations or above? NEED TO MOVE PATHS UP
-        % createSptlcorr_MSCdconns(groupAvgLoc,groupAvgName,cortexOnly,outputdir,dconnData,
-        % outputname)
-        if MakeVariantMap == 1 && SplitHalf == 1 && MakeDconn == 0            
-            disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData1,1), size(catData1,2), datestr(now)));
+        if MakeVariantMap == 1
             
-            template.data = paircorr_mod(catData1');            
-            catData1 = [];            
-            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template.data, outputfile1)            
+            outputfile1 = [subs{i} '_' tasks{j} '_EvenSessions_cortex'];
+            outputfile2 = [subs{i} '_' tasks{j} '_OddSessions_cortex'];
+            
+        end
+        
+    elseif SplitHalf == 1 && RandSample == 1
+        
+        if MakeDconn == 1 
+            
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_OddSessions_subcort'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_OddSessions_subcort'],template)
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_EvenSessions_subcort'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_EvenSessions_subcort'],template2)
+        
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile1 = [subs{i} '_' tasks{j} '_EvenSessions_subcort'];
+            outputfile2 = [subs{i} '_' tasks{j} '_OddSessions_subcort'];
+            
+        end
+        
+    elseif CortexOnly == 1 && RandSample == 1
+        
+        if MakeDconn == 1 
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_AllSessions_cortex'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_AllSessions_cortex'],template)
+            
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile = [subs{i} '_' tasks{j} '_AllSessions_cortex'];
+            
+        end
+        
+    elseif RandSample == 1
+        
+        if MakeDconn == 1 
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_AllSessions_subcort'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_AllSessions_subcort'],template)
+            
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile = [subs{i} '_' tasks{j} '_AllSessions_subcort'];
+            
+        end
+    end
+        
+        if MakeVariantMap == 1 && SplitHalf == 1 && MakeDconn == 0
+            
+            disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData1,1), size(catData1,2), datestr(now)));
+            template.data = paircorr_mod(catData1');
+            
+            catData1 = [];
+            
+            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template.data, outputfile1)
+            
             template.data = [];
             
             disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData2,1), size(catData2,2), datestr(now)));
+            template2.data = paircorr_mod(catData2');
             
-            template2.data = paircorr_mod(catData2');            
-            catData2 = [];            
-            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template2.data, outputfile2)            
-            template2.data = [];        
-        elseif MakeVariantMap == 1 && SplitHalf == 1           
-            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template.data, outputfile1)            
-            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template2.data, outputfile2)            
-        elseif MakeVariantMap == 1        
-            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template.data, outputfile)            
+            catData2 = [];
+            
+            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template2.data, outputfile2)
+            
+            template2.data = [];
+        
+        elseif MakeVariantMap == 1 && SplitHalf == 1
+            
+            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template.data, outputfile1)
+            
+            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template2.data, outputfile2)
+            
+        elseif MakeVariantMap == 1
+        
+            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template.data, outputfile)
+            
         end
             
         clear template
