@@ -29,7 +29,7 @@ subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC09','MSC10'}
 tasks = {'motor','mem','mixed'};
 voxnum = 59412; % number of voxels for template
 
-% sets up variables for number of sample points in even- and odd-numbered
+% sets up variables for sum of sample points in each task of even- and odd-numbered
 % sessions to be used later
 memptsoddsum = [];
 motorptsoddsum = [];
@@ -39,7 +39,6 @@ motorptsevensum = [];
 mixedptsevensum = [];
 %% Start analysis
 disp(sprintf('Job Started: %s', datestr(now)));
-
 %%
 %%What are these variables? What is the difference between these and the
 %%variables in the for loop below
@@ -50,7 +49,8 @@ if MatchData == 1 && MatchAcrossSubs == 1
    	memptsevensum = [];
    	motorptsevensum = [];
    	mixedptsevensum = [];
-% This for-loop determines the number of sample points for each task and for odd- and even-numbered sessions separately
+% This for-loop determines the number minimum number of sample points to 
+%match the rest of the subjects and tasks
     for n=1:numel(subs)
         
         load ([QCFiles_path subs{n} '_QCFile.mat']); %load QC files for each subject
@@ -104,21 +104,16 @@ if MatchData == 1 && MatchAcrossSubs == 1
         
     end
     
-    %%
-    %what is this doing?
+    %finds the minimum number of sample points to match the other tasks
     if SplitHalf == 1
-    
         mintasksamps = min(min([memptsoddsum motorptsoddsum mixedptsoddsum memptsevensum motorptsevensum mixedptsevensum]));
-        
     elseif ConcatenateTasks == 1
-        
         mintasksamps = min(min([(memptsoddsum + memptsevensum)  (motorptsoddsum + motorptsevensum)  (mixedptsoddsum + mixedptsevensum)]));
-        
     end
     
 end
 
-
+%% Main for-loop: makes Dconns
 for i=1:numel(subs)
     
     disp(sprintf('Creating dconn for subject %s: %s', subs{i}, datestr(now)));
@@ -131,11 +126,14 @@ for i=1:numel(subs)
     	catData = [];    
     end
     
+    %this loop will match the number of sample points for all tasks, by
+    %adding points from other sessions/subjects when there is not enough
+    %data for a task
     for j=1:length(tasks)
+        
     	if MatchData == 1 && SplitHalf == 1
-
             load ([QCFiles_path subs{i} '_QCFile.mat']);
-            %why are we setting up these variables again?
+            
             memptsodd = [];
             motorptsodd = [];
             mixedptsodd = [];
@@ -143,31 +141,24 @@ for i=1:numel(subs)
             motorptseven = [];
             mixedptseven = [];
 
+            % gets number of sample points for each task from QC files
             for u = 1:length(SubStruct)
-
                 if SubStruct(u).OddEven == 1
-
                     memptsodd = [memptsodd; SubStruct(u).MemSampPts];
                     mixedptsodd = [mixedptsodd; SubStruct(u).MixedSampPts];
                     motorptsodd = [motorptsodd SubStruct(u).MotorSampPts];
-
                 elseif SubStruct(u).OddEven == 2
-
                     memptseven = [memptseven; SubStruct(u).MemSampPts];
                     mixedptseven = [mixedptseven; SubStruct(u).MixedSampPts];
                     motorptseven = [motorptseven; SubStruct(u).MotorSampPts];
-
                 end
             end
 
-            if strcmp(subs{i}, 'MSC09')  %% Removes motor task from consideration for MSC09, why??
-
+            % gets minimum number of sample points
+            if strcmp(subs{i}, 'MSC09')  
                 minsampspts = min([sum(memptsodd) sum(mixedptsodd) sum(memptseven) sum(mixedptseven)]);
-
             else
-
                 minsampspts = min([sum(memptsodd) sum(mixedptsodd) sum(motorptsodd) sum(memptseven) sum(mixedptseven) sum(motorptseven)]);
-
             end
            
             meansamppts = floor(mintasksamps/5);
@@ -175,26 +166,22 @@ for i=1:numel(subs)
             meansampptstempodd = meansamppts;
             meansampptstempeven = meansamppts;
             
-            if strcmp(subs{i}, 'MSC09') && strcmp(tasks{j}, 'motor') && ConcatenateTasks == 1  %% Sets motor task data points for subject MSC09
-                    
+            % Sets data points for subject MSC09
+            if strcmp(subs{i}, 'MSC09') && strcmp(tasks{j}, 'motor') && ConcatenateTasks == 1                      
             	meansampptstempodd = floor(sum(motorptsodd)/5);
-            	meansampptstempeven = floor(sum(motorptseven)/5);
-                        
-            elseif strcmp(subs{i}, 'MSC09') && ConcatenateTasks == 1
-                        
+            	meansampptstempeven = floor(sum(motorptseven)/5);                        
+            elseif strcmp(subs{i}, 'MSC09') && ConcatenateTasks == 1                        
             	meansampptstempodd = meansamppts + round((meansamppts - round(sum(motorptsodd)/5))/2);
-            	meansampptstempeven = meansamppts + round((meansamppts - round(sum(motorptseven)/5))/2);
-                        
+            	meansampptstempeven = meansamppts + round((meansamppts - round(sum(motorptseven)/5))/2);                        
             end
             
-           %what are these?
            remaindertotalodd = 0;
-           remaindertotaleven = 0;
-           
+           remaindertotaleven = 0;           
            notenoughdata = zeros(length(SubStruct),1);
 
-            while true
-                
+           % if not enough data, will add sample points to match other
+           % tasks/subjects
+            while true                
             	remainderodd = 0;
             	remaindereven = 0;
                 sampspersession = zeros(length(SubStruct),1);
@@ -205,232 +192,139 @@ for i=1:numel(subs)
                 meansampptstempodd = (meansampptstempodd + round(remaindertotalodd/(5-notenoughdataodd)));
                 meansampptstempeven = (meansampptstempeven + round(remaindertotaleven/(5-notenoughdataeven)));
             
-                for v = 1:length(SubStruct)
-                        
-                	if strcmp(tasks{j}, 'mem')
-                
+                for v = 1:length(SubStruct)                        
+                	if strcmp(tasks{j}, 'mem')                
                     	if SubStruct(v).OddEven == 1
-
-                        	if SubStruct(v).MemSampPts < meansampptstempodd && notenoughdata(v) == 0
-                    
+                        	if SubStruct(v).MemSampPts < meansampptstempodd && notenoughdata(v) == 0                   
                                 notenoughdata(v) = 1;
                             	remainderodd = (remainderodd + (meansampptstempodd - SubStruct(v).MemSampPts));
-                            	sampspersession(v) = SubStruct(v).MemSampPts;
-                    
-                            	disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                    
-                            elseif notenoughdata(v) == 0
-                    
-                            	sampspersession(v) = meansampptstempodd;
-                    
-                                disp(sprintf('For subject %s and session %s there are enough sample points, sampling %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                                
-                            else
-                                
-                                sampspersession(v) = SubStruct(v).MemSampPts;
-                                
-                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                    
-                            end
-                    
-                        else
-                    
-                        	if SubStruct(v).MemSampPts < meansampptstempeven && notenoughdata(v) == 0
-                    
+                            	sampspersession(v) = SubStruct(v).MemSampPts;                    
+                            	disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                    
+                            elseif notenoughdata(v) == 0                   
+                            	sampspersession(v) = meansampptstempodd;                    
+                                disp(sprintf('For subject %s and session %s there are enough sample points, sampling %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                               
+                            else                                
+                                sampspersession(v) = SubStruct(v).MemSampPts;                                
+                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                    
+                            end                    
+                        else                    
+                        	if SubStruct(v).MemSampPts < meansampptstempeven && notenoughdata(v) == 0                    
                             	notenoughdata(v) = 1;
                                 remaindereven = (remaindereven + (meansampptstempeven - SubStruct(v).MemSampPts));
-                                sampspersession(v) = SubStruct(v).MemSampPts;
-                    
-                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                    
-                            elseif notenoughdata(v) == 0
-                    
-                                sampspersession(v) = meansampptstempeven;
-                    
-                                disp(sprintf('For subject %s and session %s there are enough sample points, sampling %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                                
-                            else
-                                
-                                sampspersession(v) = SubStruct(v).MemSampPts;
-                                
-                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                    
-                            end
-                    
-                        end
-                            
-                    elseif strcmp(tasks{j}, 'mixed')
-                            
+                                sampspersession(v) = SubStruct(v).MemSampPts;                    
+                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                    
+                            elseif notenoughdata(v) == 0                    
+                                sampspersession(v) = meansampptstempeven;                    
+                                disp(sprintf('For subject %s and session %s there are enough sample points, sampling %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                                
+                            else                                
+                                sampspersession(v) = SubStruct(v).MemSampPts;                                
+                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                    
+                            end                    
+                        end                            
+                    elseif strcmp(tasks{j}, 'mixed')                            
                     	 if SubStruct(v).OddEven == 1
-
-                        	if SubStruct(v).MixedSampPts < meansampptstempodd && notenoughdata(v) == 0
-                    
+                        	if SubStruct(v).MixedSampPts < meansampptstempodd && notenoughdata(v) == 0                    
                                 notenoughdata(v) = 1;
                             	remainderodd = (remainderodd + (meansampptstempodd - SubStruct(v).MixedSampPts));
-                            	sampspersession(v) = SubStruct(v).MixedSampPts;
-                    
-                            	disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                    
-                            elseif notenoughdata(v) == 0
-                    
-                            	sampspersession(v) = meansampptstempodd;
-                    
-                                disp(sprintf('For subject %s and session %s there are enough sample points, sampling %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                                
-                            else
-                                
-                                sampspersession(v) = SubStruct(v).MixedSampPts;
-                                
-                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                    
-                            end
-                    
-                        else
-                    
-                        	if SubStruct(v).MixedSampPts < meansampptstempeven && notenoughdata(v) == 0
-                    
+                            	sampspersession(v) = SubStruct(v).MixedSampPts;                    
+                            	disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                    
+                            elseif notenoughdata(v) == 0                    
+                            	sampspersession(v) = meansampptstempodd;                    
+                                disp(sprintf('For subject %s and session %s there are enough sample points, sampling %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                               
+                            else                                
+                                sampspersession(v) = SubStruct(v).MixedSampPts;                                
+                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                    
+                            end                    
+                         else                    
+                        	if SubStruct(v).MixedSampPts < meansampptstempeven && notenoughdata(v) == 0                    
                             	notenoughdata(v) = 1;
                                 remaindereven = (remaindereven + (meansampptstempeven - SubStruct(v).MixedSampPts));
-                                sampspersession(v) = SubStruct(v).MixedSampPts;
-                    
-                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                    
-                            elseif notenoughdata(v) == 0
-                    
-                                sampspersession(v) = meansampptstempeven;
-                    
-                                disp(sprintf('For subject %s and session %s there are enough sample points, sampling %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                                
-                            else
-                                
-                                sampspersession(v) = SubStruct(v).MixedSampPts;
-                                
-                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                    
+                                sampspersession(v) = SubStruct(v).MixedSampPts;                    
+                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                    
+                            elseif notenoughdata(v) == 0                    
+                                sampspersession(v) = meansampptstempeven;                    
+                                disp(sprintf('For subject %s and session %s there are enough sample points, sampling %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                                
+                            else                                
+                                sampspersession(v) = SubStruct(v).MixedSampPts;                                
+                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                    
                             end
-                        end
-                            
-                  	elseif strcmp(tasks{j}, 'motor')
-                            
+                         end                            
+                  	elseif strcmp(tasks{j}, 'motor')                            
                      	if SubStruct(v).OddEven == 1
-
-                        	if SubStruct(v).MotorSampPts < meansampptstempodd && notenoughdata(v) == 0
-                    
+                        	if SubStruct(v).MotorSampPts < meansampptstempodd && notenoughdata(v) == 0                    
                                 notenoughdata(v) = 1;
                             	remainderodd = (remainderodd + (meansampptstempodd - SubStruct(v).MotorSampPts));
-                            	sampspersession(v) = SubStruct(v).MotorSampPts;
-                    
-                            	disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                    
-                            elseif notenoughdata(v) == 0
-                    
-                            	sampspersession(v) = meansampptstempodd;
-                    
-                                disp(sprintf('For subject %s and session %s there are enough sample points, sampling %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                                
-                            else
-                                
-                                sampspersession(v) = SubStruct(v).MotorSampPts;
-                                
-                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                    
-                            end
-                    
-                        else
-                    
-                        	if SubStruct(v).MotorSampPts < meansampptstempeven && notenoughdata(v) == 0
-                    
+                            	sampspersession(v) = SubStruct(v).MotorSampPts;                    
+                            	disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                    
+                            elseif notenoughdata(v) == 0                    
+                            	sampspersession(v) = meansampptstempodd;                    
+                                disp(sprintf('For subject %s and session %s there are enough sample points, sampling %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                                
+                            else                                
+                                sampspersession(v) = SubStruct(v).MotorSampPts;                                
+                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                    
+                            end                    
+                        else                    
+                        	if SubStruct(v).MotorSampPts < meansampptstempeven && notenoughdata(v) == 0                    
                             	notenoughdata(v) = 1;
                                 remaindereven = (remaindereven + (meansampptstempeven - SubStruct(v).MotorSampPts));
-                                sampspersession(v) = SubStruct(v).MotorSampPts;
-                    
-                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                    
-                            elseif notenoughdata(v) == 0
-                    
-                                sampspersession(v) = meansampptstempeven;
-                    
-                                disp(sprintf('For subject %s and session %s there are enough sample points, sampling %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                                
-                            else
-                                
-                                sampspersession(v) = SubStruct(v).MotorSampPts;
-                                
-                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));
-                    
-                            end
-                            
+                                sampspersession(v) = SubStruct(v).MotorSampPts;                    
+                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                    
+                            elseif notenoughdata(v) == 0                    
+                                sampspersession(v) = meansampptstempeven;                    
+                                disp(sprintf('For subject %s and session %s there are enough sample points, sampling %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                                
+                            else                                
+                                sampspersession(v) = SubStruct(v).MotorSampPts;                                
+                                disp(sprintf('For subject %s and session %s there are not enough sample points, sampling only %i sample points from this session: %s', subs{i}, SubStruct(v).SessionFile, sampspersession(v), datestr(now)));                    
+                            end                            
                         end
                     end    
               	end
             
-                if remainderodd == 0 && remaindereven == 0
-                    
-                    disp(sprintf('Data sampling calculated for subject %s for task %s: %s', subs{i}, tasks{j}, datestr(now)));
-                
-                    break
-                    
-                elseif (sum(notenoughdata) == 10) || (sum(notenoughdataeven) == 5 && remainderodd == 0) || (sum(notenoughdataodd) == 5 && remaindereven == 0)
-                    
-                    disp(sprintf('Not enough data is present for this task to have enough data for subject %s for task %s: %s', subs{i}, tasks{j}, datestr(now)));
-                    
-                    break
-                
-                else
-                
+                if remainderodd == 0 && remaindereven == 0                    
+                    disp(sprintf('Data sampling calculated for subject %s for task %s: %s', subs{i}, tasks{j}, datestr(now)));                
+                    break                    
+                elseif (sum(notenoughdata) == 10) || (sum(notenoughdataeven) == 5 && remainderodd == 0) || (sum(notenoughdataodd) == 5 && remaindereven == 0)                    
+                    disp(sprintf('Not enough data is present for this task to have enough data for subject %s for task %s: %s', subs{i}, tasks{j}, datestr(now)));                    
+                    break                
+                else                
                 	remaindertotalodd = remainderodd;
-                    remaindertotaleven = remaindereven;
-                    
+                    remaindertotaleven = remaindereven;                    
                     disp(sprintf('Remainder of %i calculated for odd files for subject %s for task %s and session %s: %s', remainderodd, subs{i}, tasks{j}, SubStruct(v).SessionFile, datestr(now)));
-                    disp(sprintf('Remainder of %i calculated for even files for subject %s for task %s and session %s: %s', remaindereven, subs{i}, tasks{j}, SubStruct(v).SessionFile, datestr(now)));
-                
+                    disp(sprintf('Remainder of %i calculated for even files for subject %s for task %s and session %s: %s', remaindereven, subs{i}, tasks{j}, SubStruct(v).SessionFile, datestr(now)));                
                 end
             end
             
         elseif MatchData == 1
             
-
-                load (['/projects/b1081/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
+                load ([QCFiles_path subs{i} '_QCFile.mat']);
         
                 mempts = [];
                 motorpts = [];
                 mixedpts = [];
 
-                for u = 1:length(SubStruct)
-                
+                for u = 1:length(SubStruct)                
                     mempts = [mempts; SubStruct(u).MemSampPts];
                     mixedpts = [mixedpts; SubStruct(u).MixedSampPts];
                     motorpts = [motorpts; SubStruct(u).MotorSampPts];
-
                 end
 
                 minsampspts = min([sum(mempts) sum(mixedpts) sum(motorpts)]);
                 
             if MatchAcrossSubs == 0
-
-                meansamppts = floor(minsampspts/5);
-                
-                disp(sprintf('For subject %s the minimum number of sample points in a split-half is %i, with a mean of %i points per sesssion: %s', subs{i}, minsampspts, meansamppts, datestr(now)));
-            
-            elseif SplitHalf == 1
-                
-                meansamppts = floor(mintasksamps/5);
-        
-                disp(sprintf('For all subjects, the minimum number of sample points in a split-half is %i, with a mean of %i points per sesssion: %s', mintasksamps, meansamppts, datestr(now)));
-            
+                meansamppts = floor(minsampspts/5);                
+                disp(sprintf('For subject %s the minimum number of sample points in a split-half is %i, with a mean of %i points per sesssion: %s', subs{i}, minsampspts, meansamppts, datestr(now)));            
+            elseif SplitHalf == 1                
+                meansamppts = floor(mintasksamps/5);        
+                disp(sprintf('For all subjects, the minimum number of sample points in a split-half is %i, with a mean of %i points per sesssion: %s', mintasksamps, meansamppts, datestr(now)));            
                 meansampptstempodd = meansamppts;
-                meansampptstempeven = meansamppts;
-                
-            else
-                
+                meansampptstempeven = meansamppts;                
+            else                
                 meansamppts = floor(mintasksamps/10);
-                meansampptstemp = meansamppts;
-                
-                disp(sprintf('For all subjects, the minimum number of sample points in a full file is %i, with a mean of %i points per sesssion: %s', mintasksamps, meansamppts, datestr(now)));
-            
+                meansampptstemp = meansamppts;                
+                disp(sprintf('For all subjects, the minimum number of sample points in a full file is %i, with a mean of %i points per sesssion: %s', mintasksamps, meansamppts, datestr(now)));            
             end
 
-            %disp(sprintf('For subject %s the minimum number of sample points in a split-half is %i, with a mean of %i points per sesssion per task for concatenation: %s', subs{i}, minsampspts, meansamppts/3, datestr(now)));
+            disp(sprintf('For subject %s the minimum number of sample points is %i, with a mean of %i points per sesssion per task for concatenation: %s', subs{i}, minsampspts, meansamppts/3, datestr(now)));
             
             if strcmp(subs{i}, 'MSC09') && strcmp(tasks{j}, 'motor') && ConcatenateTasks == 1  %% Sets motor task data points for subject MSC09
                 

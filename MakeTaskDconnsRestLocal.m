@@ -1,12 +1,15 @@
 parpool('local', 28)     %% Name of cluster profile for batch job
 
-%/davta/vnil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_motor_passvv2/
-%/data/nil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_mem_pass2/
-%/data/nil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_mixed_pass2/
 clear all
 
+disp(sprintf('Job Submitted: %s', datestr(now)));
+
+%% Paths
+outdir = '/projects/b1081/Brian_MSC/dconn_task_files';
+dataLocStem = '/MSC/TaskFC/';
+cd '/projects/b1081';   %% Change CD to root project directory
+%% Options
 RestOnly = 0; %% Toggles whether to only use resting data in dconn and not consider task data at all
-CortexOnly = 1; %% Toggles cortex only template on/off
 SplitHalf = 1;  %% Toggles whether to calculate rest for split-half of sessions
 SubSample = 1;  %% Toggles subsampling of tmask on/off (for comparing task to rest)
 RandSample = 1; %% Toggles random subsampling of tmask on/off
@@ -16,55 +19,28 @@ MatchAcrossSubs = 1;  %% Toggles whether to match the amount of data across subj
 ConcatenateTasksMatch = 1; %% Toggles whether to calculate matched task data for concatenated tasks
 ConcatenateTaskData = 1; %% Toggles whether to concatenate task data within subjects
 ConcatenateSessionData = 1; %% Toggles whether to concatenate session data within subjects
-ConcatenateSplitHalf = 0;  %% Toggles whether to concatenate split halves into one vector
 WriteDconn = 0; %% Toggles whether to write dconn to disk
 CreateVariant = 1; %% Toggles whether to create a variant map from dconn
 SaveTimeseries = 1;     %% Save concatenated timeseries for subject
-
-outdir = '/projects/b1081/Brian_MSC/dconn_task_files';
-dataLocStem = '/MSC/TaskFC/';
-%subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC10'};
+%% Variables
 subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC09','MSC10'};
 tasks = {'motor','mem','mixed'};
-%tasks = {'motor'};
-%times = [65 70 75 80 85 90 95 100];
-times = [];
-
-cd '/projects/b1081';   %% Change CD to root project directory
-
-disp(sprintf('Job Submitted: %s', datestr(now)));
+times = 1;
+voxnum = 59412;
 
 
 disp(sprintf('Job Started: %s', datestr(now)));
 
-if numel(times) == 0
-    
-    times = 1;
-    
-end
 
-if ConcatenateTasksMatch == 1
-    
+if ConcatenateTasksMatch == 1    
     taskbackup = tasks;
-    
 end
 
 
-if RestOnly == 1
-    
+if RestOnly == 1    
     tasks = {'rest'};
-    
 end
 
-if CortexOnly == 1      %% Select correct number of voxels for template
-    
-    voxnum = 59412;
-    
-else
-    
-    voxnum = 65625;
-    
-end
 
 if MatchData == 1 && MatchAcrossSubs == 1
 
