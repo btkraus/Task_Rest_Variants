@@ -10,10 +10,12 @@ clear all
 disp(sprintf('Job Submitted: %s', datestr(now)));
 
 %% Paths
-outdir = '/projects/b1081/Brian_MSC/Analysis_Scripts_Replication/dconn_task_files'; %specify output directory
+outdir = '/projects/b1081/member_directories/dperez/Analysis_Scripts_Replication'; %specify output directory
 dataLocStem = '/MSC/TaskFC/'; %specify location of data
-QCFiles_path = '/projects/b1081/Brian_MSC/Analysis_Scripts_Replication/QC_files/';
-template_path = '/projects/b1081/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii';
+QCFiles_path = '/projects/b1081/member_directories/bkraus/Brian_MSC/Analysis_Scripts_Replication/QC_files/';
+template_path = '/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii';
+atlas_path = '/projects/b1081/Atlases';
+output_path = '/project/b1081/member_directories/dperez/Analysis_Scripts_Replication/variant_maps';
 cd '/projects/b1081';   %% Change CD to root project directory
 %% Options
 SplitHalf = 1;  %% Toggles whether to create a separate file for odd/even sessions
@@ -689,20 +691,20 @@ for i=1:numel(subs)
             
             template.data = paircorr_mod(catData1');            
             catData1 = [];            
-            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template.data, outputfile1)            
+            createSptlcorr_MSCdconns(atlas_path, '120_allsubs_corr',1,output_path,template.data, outputfile1)            
             template.data = [];
             
             disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData2,1), size(catData2,2), datestr(now)));
             
             template2.data = paircorr_mod(catData2');            
             catData2 = [];            
-            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template2.data, outputfile2)            
+            createSptlcorr_MSCdconns(atlas_path, '120_allsubs_corr',1,output_path,template2.data, outputfile2)            
             template2.data = [];        
         elseif MakeVariantMap == 1 && SplitHalf == 1           
-            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template.data, outputfile1)            
-            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template2.data, outputfile2)            
+            createSptlcorr_MSCdconns(atlas_path, '120_allsubs_corr',1,output_path,template.data, outputfile1)            
+            createSptlcorr_MSCdconns(atlas_path, '120_allsubs_corr',1,output_path,template2.data, outputfile2)            
         elseif MakeVariantMap == 1        
-            createSptlcorr_MSCdconns('/projects/b1081/Atlases', '120_allsubs_corr',1,'/home/btk2142/output_files/variant_maps',template.data, outputfile)            
+            createSptlcorr_MSCdconns(atlas_path, '120_allsubs_corr',1,output_path,template.data, outputfile)            
         end
             
         clear template
