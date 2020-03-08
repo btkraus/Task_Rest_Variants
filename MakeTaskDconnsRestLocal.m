@@ -15,6 +15,7 @@ output_path = '/home/btk2142/output_files/variant_maps';
 template_path = '/projects/b1081/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii';
 cd '/projects/b1081';   %% Change CD to root project directory
 %% Options
+%potentially take out restonly and subsample
 RestOnly = 0; %% Toggles whether to only use resting data in dconn and not consider task data at all
 SplitHalf = 1;  %% Toggles whether to calculate rest for split-half of sessions
 SubSample = 1;  %% Toggles subsampling of tmask on/off (for comparing task to rest)

@@ -1,6 +1,6 @@
 %%Questions: Have you decided if will include AnyOverlap or COMOverlap in
-%%paper? Do I leave the option SubjectPlots? Do I keep the code for making a bar
-%%graph? (line 1750)
+%%paper? NOT included... Do I leave the option SubjectPlots? Do I keep the code for making a bar
+%%graph? No (line 1750)
 
 
 %% QuantifyVariantOverlap.m 

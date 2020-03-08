@@ -438,7 +438,8 @@ for i=1:numel(subs)
             
             MSCciftidir = strcat(MSCcondidir, 'cifti_timeseries_normalwall_native_freesurf');
 
-            %what is this doing? 
+            %what is this doing? loading tmask and timeseries data and
+            %applying tmask to timeseries -- take out try loop
             try
                 data = ft_read_cifti_mod([MSCciftidir '/' vcids{k} '_LR_surf_subcort_333_32k_fsLR_smooth2.55.dtseries.nii']);
                 data = data.data;
