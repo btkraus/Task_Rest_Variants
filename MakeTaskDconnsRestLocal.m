@@ -1,18 +1,23 @@
-parpool('local', 28)     %% Name of cluster profile for batch job
+% This script makes Dconns (if the MakeDconn variable = 1) and variant files
+% (if VariantMap = 1)for rest data of each subject's even and odd sessions. 
+% QC files need to be na med [subject]_QCFile.mat, ex. 'MSC01_QCFile.mat'
+% Written by Brian Kraus, edited by Diana Perez.
+
+parpool('local', 28)     %% Name of cluster profile for batch job (how many workers/cores you need to run this job)
 
 clear all
 
 disp(sprintf('Job Submitted: %s', datestr(now)));
 
 %% Paths
-outdir = '/projects/b1081/Brian_MSC/dconn_task_files';
-dataLocStem = '/MSC/TaskFC/';
-QC_path = '/projects/b1081/Brian_MSC/QC_files/';
-groupavg_path = '/projects/b1081/Atlases';
-groupavg_name = '120_allsubs_corr';
-rest_path = '/projects/b1081/MSC/MSCdata_v1/';
-output_path = '/home/btk2142/output_files/variant_maps';
-template_path = '/projects/b1081/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii';
+outdir = '/projects/b1081/member_directories/dperez/Analysis_Scripts_Replication/';%specify output directory
+dataLocStem = '/MSC/TaskFC/'; %specify location of data
+QC_path = '/projects/b1081/Brian_MSC/QC_files/'; %specify location of QC files
+groupavg_path = '/projects/b1081/Atlases'; %specify location of group average map
+groupavg_name = '120_allsubs_corr'; %specify name of group average map
+rest_path = '/projects/b1081/MSC/MSCdata_v1/'; %specify location of rest data
+output_path = '/home/btk2142/output_files/variant_maps'; %%%%%% WHAT IS THE DIFFERENCE BETWEEN THIS AND outdir?
+template_path = '/projects/b1081/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii'; %location of correlation map (???) to be used as template
 cd '/projects/b1081';   %% Change CD to root project directory
 %% Options
 %potentially take out restonly and subsample
@@ -35,9 +40,6 @@ tasks = {'motor','mem','mixed'};
 times = 1;
 voxnum = 59412;
 
-
-disp(sprintf('Job Started: %s', datestr(now)));
-
 if ConcatenateTasksMatch == 1    
     taskbackup = tasks;
 end
@@ -45,10 +47,12 @@ end
 if RestOnly == 1    
     tasks = {'rest'};
 end
-
-% setting up variables
+%% Start Analysis 
+disp(sprintf('Job Started: %s', datestr(now)));
+%% Matches data points for all tasks across subjects
 if MatchData == 1 && MatchAcrossSubs == 1
-
+    % sets up variables for sum of sample points in each task of even- and odd-numbered
+    % sessions to be used later
    	memptsoddsum = [];
    	motorptsoddsum = [];
    	mixedptsoddsum = [];

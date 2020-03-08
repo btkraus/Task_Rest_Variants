@@ -1,6 +1,6 @@
 % This script makes Dconns (if the MakeDconn variable = 1) and variant files
-% (if VariantMap = 1)for each subject's even and odd sessions. 
-% QC files need to be named [subject]_QCFile.mat, ex. 'MSC01_QCFile.mat'
+% (if VariantMap = 1)for task data of each subject's even and odd sessions. 
+% QC files need to be na med [subject]_QCFile.mat, ex. 'MSC01_QCFile.mat'
 % Written by Brian Kraus, edited by Diana Perez.
 
 parpool('local', 28)     %% Name of cluster profile for batch job (how many workers/cores you need to run this job)
@@ -15,8 +15,10 @@ dataLocStem = '/MSC/TaskFC/'; %specify location of data
 QCFiles_path = '/projects/b1081/member_directories/bkraus/Brian_MSC/Analysis_Scripts_Replication/QC_files/';
 template_path = '/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii';
 atlas_path = '/projects/b1081/Atlases';
-output_path = '/project/b1081/member_directories/dperez/Analysis_Scripts_Replication/variant_maps';
+output_path = '/projects/b1081/member_directories/dperez/Analysis_Scripts_Replication/variant_maps';
 cd '/projects/b1081';   %% Change CD to root project directory
+addpath(genpath('/projects/b1081/member_directories/bkraus/Brian_MSC/'));
+addpath(genpath('/projects/b1081/member_directories/dperez/Analysis_Scripts_Replication/'));
 %% Options
 SplitHalf = 1;  %% Toggles whether to create a separate file for odd/even sessions
 MatchData = 1; %% Toggles whether to match the amount of data per task as the lowest value within each split-half
@@ -26,7 +28,7 @@ MatchAcrossTasks = 0;  %% Toggles whether to match the amount of data across tas
 ConcatenateTasks = 1;   %% Toggles whether to concatenate data for all tasks
 MakeDconn = 0;  %% Toggles whether to write a dconn
 MakeVariantMap = 1; %% Toggles whether to write a variant map
-SaveTimeseries = 1;     %% Save concatenated timeseries for subject
+SaveTimeseries = 0;     %% Save concatenated timeseries for subject
 %% Variables
 subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC09','MSC10'};
 tasks = {'motor','mem','mixed'};
@@ -44,13 +46,6 @@ mixedptsevensum = [];
 disp(sprintf('Job Started: %s', datestr(now)));
 %% Matches data points for all tasks across subjects
 if MatchData == 1 && MatchAcrossSubs == 1
-   	memptsoddsum = [];
-   	motorptsoddsum = [];
-   	mixedptsoddsum = [];
-   	memptsevensum = [];
-   	motorptsevensum = [];
-   	mixedptsevensum = [];
-    
 % This for-loop determines the number of sample points to match
     for n=1:numel(subs)
         
@@ -552,14 +547,15 @@ for i=1:numel(subs)
     % does the script load the group network map?
     if SplitHalf == 1 && MakeDconn == 1        
     	disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData1,1), size(catData1,2), datestr(now)));
-    	template.data = paircorr_mod(catData1');
+    	%template.data = paircorr_mod(catData1');
+        template.data = catData1;
         catData1 = [];
     	disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData2,1), size(catData2,2), datestr(now)));
-     	template2.data = paircorr_mod(catData2');
+     	template2.data = catData2;
         catData2 = [];        
     elseif SplitHalf == 0     
         disp(sprintf('Running Correlations: %s', datestr(now)));
-        template.data = paircorr_mod(catData');
+        template.data = catData;
         catData = [];    
     end
     
@@ -690,22 +686,22 @@ for i=1:numel(subs)
         if MakeVariantMap == 1 && SplitHalf == 1 && MakeDconn == 0            
             disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData1,1), size(catData1,2), datestr(now)));
             
-            template.data = paircorr_mod(catData1');            
+            template.data = catData1;            
             catData1 = [];            
-            createSptlcorr_MSCdconns(atlas_path, '120_allsubs_corr',1,output_path,template.data, outputfile1)            
+            createSptlcorr_MSCdconns_timeseries(atlas_path, '120_allsubs_corr',1,output_path,template.data, outputfile1)            
             template.data = [];
             
             disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData2,1), size(catData2,2), datestr(now)));
             
-            template2.data = paircorr_mod(catData2');            
+            template2.data = catData2;            
             catData2 = [];            
-            createSptlcorr_MSCdconns(atlas_path, '120_allsubs_corr',1,output_path,template2.data, outputfile2)            
+            createSptlcorr_MSCdconns_timeseries(atlas_path, '120_allsubs_corr',1,output_path,template2.data, outputfile2)            
             template2.data = [];        
         elseif MakeVariantMap == 1 && SplitHalf == 1           
-            createSptlcorr_MSCdconns(atlas_path, '120_allsubs_corr',1,output_path,template.data, outputfile1)            
-            createSptlcorr_MSCdconns(atlas_path, '120_allsubs_corr',1,output_path,template2.data, outputfile2)            
+            createSptlcorr_MSCdconns_timeseries(atlas_path, '120_allsubs_corr',1,output_path,template.data, outputfile1)            
+            createSptlcorr_MSCdconns_timeseries(atlas_path, '120_allsubs_corr',1,output_path,template2.data, outputfile2)            
         elseif MakeVariantMap == 1        
-            createSptlcorr_MSCdconns(atlas_path, '120_allsubs_corr',1,output_path,template.data, outputfile)            
+            createSptlcorr_MSCdconns_timeseries(atlas_path, '120_allsubs_corr',1,output_path,template.data, outputfile)            
         end
             
         clear template
