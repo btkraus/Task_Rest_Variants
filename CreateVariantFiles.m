@@ -8,9 +8,9 @@ clear all
 %% Paths
 %change paths
 workbenchdir = '/Applications/workbench/bin_macosx64/';
-leftsurf = '/Users/briankraus/Desktop/Quest_Files/Atlases/32k_ConteAtlas_v2_distribute/Conte69.L.midthickness.32k_fs_LR.surf.gii';
-rightsurf = '/Users/briankraus/Desktop/Quest_Files/Atlases/32k_ConteAtlas_v2_distribute/Conte69.R.midthickness.32k_fs_LR.surf.gii';
-dirpath = '/Users/briankraus/Desktop/';
+leftsurf = '/Users/dianaperez/Box/Dependencies/32k_ConteAtlas_v2_distribute/Conte69.L.midthickness.32k_fs_LR.surf.gii';
+rightsurf = '/Users/dianaperez/Box/Dependencies/32k_ConteAtlas_v2_distribute/Conte69.R.midthickness.32k_fs_LR.surf.gii';
+dirpath = '/Users//Users/dianaperez/Box/Latest_Analysis_Replication';
 resttxtname = 'MSC_rest_alltask_samedata_all_varmaps.txt';
 tasktxtname = 'MSC_alltask_samedata_all_varmaps.txt';
 SNRpath = '/Users/briankraus/Desktop/MSC_SNR_Maps/CIFTI_Files/MSC_Template/Individual_Session_Map/';
