@@ -10,10 +10,10 @@ clear all
 workbenchdir = '/Applications/workbench/bin_macosx64/';
 leftsurf = '/Users/dianaperez/Box/Dependencies/32k_ConteAtlas_v2_distribute/Conte69.L.midthickness.32k_fs_LR.surf.gii';
 rightsurf = '/Users/dianaperez/Box/Dependencies/32k_ConteAtlas_v2_distribute/Conte69.R.midthickness.32k_fs_LR.surf.gii';
-dirpath = '/Users//Users/dianaperez/Box/Latest_Analysis_Replication';
-resttxtname = 'MSC_rest_alltask_samedata_all_varmaps.txt';
-tasktxtname = 'MSC_alltask_samedata_all_varmaps.txt';
-SNRpath = '/Users/briankraus/Desktop/MSC_SNR_Maps/CIFTI_Files/MSC_Template/Individual_Session_Map/';
+dirpath = '/Users/dianaperez/Documents/GitHub/Task_Rest_Variants/';
+resttxtname = 'MSC_rest_varmaps_even.txt';
+tasktxtname = 'MSC_task_varmaps_even.txt';
+SNRpath = '/Users/dianaperez/Box/Quest_Backup/member_directories/bkraus/BrianMSC';
 outfilepath = '/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Matched_Task_Data/TaskCat_Split_Half_Data/';
 
 %%
