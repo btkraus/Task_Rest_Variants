@@ -49,7 +49,7 @@ if MatchData == 1 && MatchAcrossSubs == 1
 % This for-loop determines the number of sample points to match
     for n=1:numel(subs)
         
-        load ([QCFiles_path subs{n} '_QCFile.mat']); %load QC files for each subject
+        load ([QCFiles_path subs{n} '_QCFile.mat']); 
         
         % sets up variables for number of sample points available for
         % current subject
