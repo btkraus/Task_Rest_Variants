@@ -1,6 +1,6 @@
 % This script makes Dconns (if the MakeDconn variable = 1) and variant files
 % (if VariantMap = 1)for task data of each subject's even and odd sessions. 
-% QC files need to be na med [subject]_QCFile.mat, ex. 'MSC01_QCFile.mat'
+% QC files need to be named [subject]_QCFile.mat, ex. 'MSC01_QCFile.mat'
 % Written by Brian Kraus, edited by Diana Perez.
 
 parpool('local', 28)     %% Name of cluster profile for batch job (how many workers/cores you need to run this job)
@@ -33,6 +33,7 @@ SaveTimeseries = 0;     %% Save concatenated timeseries for subject
 subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC09','MSC10'};
 tasks = {'motor','mem','mixed'};
 voxnum = 59412; % number of voxels for template
+outtxtfile = [];
 
 % sets up variables for sum of sample points in each task of even- and odd-numbered
 % sessions to be used later

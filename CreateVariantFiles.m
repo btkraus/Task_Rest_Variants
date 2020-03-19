@@ -9,7 +9,7 @@ clear all
 
 %% Variables
 ExcludeBySize = 1;
-SplitHalf = 0;
+SplitHalf = 1;
 ExclusionCriteria = 15;  %minimum number of vertices required for variant to not be excluded
 threshold = 2.5;  %% Thresholds used to calculate variants (lowest % or correlation values)
 SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR, 1 = exclude, 0 = don't exclude
@@ -22,11 +22,7 @@ SNRpath = '/Users/dianaperez/Box/Latest_Analysis_Replication/SNR_maps/';
 outfilepath = '/Users/dianaperez/Box/Latest_Analysis_Replication/';
 resttxtname = 'MSC_rest_spCorrMaps.txt';
 tasktxtname = 'MSC_task_spCorrMaps.txt';
-
-%testing making the txt files on-line
-txtpaths = [];
-txtsubjects = [];
-txtsplithalf = [];
+addpath(genpath('/Users/dianaperez/Box/Dependencies/cifti-matlab-master/'));
 
 % reads file paths, sub numbers split-halves from txt files    
 [task_files, subjects1, tasksplithalf] = textread([dirpath tasktxtname],'%s%s%s');
@@ -53,14 +49,13 @@ for x = 1:length(rest_files)
         cifti_task.data(SNRexclude,1) = NaN;
     end
 
-    %% Makes variant maps
-    %this part makes the variant mask by finding the vertices that are
-    %below the threshold, making those vertices = 1 and all other
-    %vertices = 0
+    %% Makes variant mask 
     
+    %finds vertices below the threshold percentile 
     cifti_task_threshold = find(cifti_task.data < prctile(cifti_task.data,threshold));
     cifti_rest_threshold = find(cifti_rest.data < prctile(cifti_rest.data,threshold));
 
+    % sets all values to zero except for those that are below the threshold
     cifti_rest_thresh_dat = zeros(size(cifti_rest.data));
     cifti_rest_thresh_dat(cifti_rest_threshold,1) = 1;
 
@@ -70,6 +65,7 @@ for x = 1:length(rest_files)
     cifti_rest_final_dat = zeros(size(cifti_rest.data));
     cifti_task_final_dat = zeros(size(cifti_task.data));
 
+    % sets value = 1 if vertex is below the threshold
     for w = 1:length(cifti_rest.data)
         if cifti_rest_thresh_dat(w) == 1
             cifti_rest_final_dat(w) = 1;
@@ -78,15 +74,27 @@ for x = 1:length(rest_files)
             cifti_task_final_dat(w) = 1;
         end
     end
-
+    
+    % creates strings to be included in file name for outputs
     if SNRexclusion == 1
-        strrest = ['SNRExclude_' restsplithalf{x}];
-        strtask = ['SNRExclude_' tasksplithalf{x}];
-    else 
-        strrest = [restsplithalf{x}];
-        strtask = [tasksplithalf{x}];
+        if SplitHalf == 1
+            strrest = ['SNRExclude_' restsplithalf{x}];
+            strtask = ['SNRExclude_' tasksplithalf{x}];
+        else
+            strrest = ['SNRExclude_'];
+            strtask = ['SNRExclude_'];
+        end
+    else
+        if SplitHalf == 1
+            strrest = [restsplithalf{x}];
+            strtask = [tasksplithalf{x}];
+        else
+            strrest = ['_'];
+            strtask = ['_'];
+        end
     end
     
+    % creates subfolders for thresholded variant maps
     subFolderRest = [outfilepath 'Thresholded_Variant_Maps/Rest'];
     subFolderTask = [outfilepath 'Thresholded_Variant_Maps/Task'];
     if ~isfolder(subFolderRest)
@@ -106,6 +114,7 @@ for x = 1:length(rest_files)
     ft_write_cifti_mod(outfilerest, cifti_rest)
     ft_write_cifti_mod(outfiletask, cifti_task)
     
+    % creates subfolder for size excluded variant maps
     subFolderRest = [outfilepath 'SizeExcluded_Variant_Maps/Rest'];
     subFolderTask = [outfilepath 'SizeExcluded_Variant_Maps/Task'];
     if ~isfolder(subFolderRest)
@@ -114,6 +123,8 @@ for x = 1:length(rest_files)
     if ~isfolder(subFolderTask)
         mkdir(subFolderTask)
     end
+    
+    %sets names for output files
     outfilewbtask = [subFolderTask '/' subject '_Task_Variant_SizeExcluded_' strtask '_' num2str(threshold) '.dtseries.nii'];
     outfilewbrest = [subFolderRest '/' subject '_Rest_Variant_SizeExcluded_' strrest '_' num2str(threshold) '.dtseries.nii'];
 
@@ -127,23 +138,70 @@ for x = 1:length(rest_files)
 
     if ExcludeBySize == 1 
         [cifti_rest.data, cifti_task.data] = ExcludeVariantSize(cifti_rest.data, cifti_task.data, subject, threshold, ExclusionCriteria);
-    end 
-
-    ft_write_cifti_mod(outfilewbrest, cifti_rest)
-    ft_write_cifti_mod(outfilewbtask, cifti_task)
-    
-    if isempty(txtpaths)
-        txtpaths = cellstr(outfilewbrest);
-        txtsubjects = cellstr(subject);
-        txtsplithalf = tasksplithalf(x);
-    else
-        txtpaths = [txtpaths; cellstr(outfilewbrest)];
-        txtsubjects = [txtsubjects; cellstr(subject)];
-        txtsplithalf = [txtsplithalf; tasksplithalf(x)];
     end
     
+    %% writes output file with numbered variants
+    ft_write_cifti_mod(outfilewbrest, cifti_rest)
+    ft_write_cifti_mod(outfilewbtask, cifti_task)
+  
+    %% Creates txt file outputs for next script
+    if SplitHalf == 1
+        if strcmp(restsplithalf(x),'Even')
+            resttxtline = [outfilewbrest ' ' subject ' Even'];            
+            if ~exist('evenresttxtfile')
+                evenresttxtfile = resttxtline;
+            else
+                evenresttxtfile = [evenresttxtfile; resttxtline];
+            end
+        elseif strcmp(restsplithalf(x), 'Odd_')
+            resttxtline = [outfilewbrest ' ' subject ' Odd_'];
+            if ~exist('oddresttxtfile')
+                oddresttxtfile = resttxtline;
+            else
+                oddresttxtfile = [oddresttxtfile; resttxtline];
+            end
+        end
+        if strcmp(tasksplithalf(x),'Even')
+            tasktxtline = [outfilewbtask ' ' subject ' Even'];
+            if ~exist('eventasktxtfile')
+                eventasktxtfile = tasktxtline;
+            else
+                eventasktxtfile = [eventasktxtfile; tasktxtline];
+            end
+        elseif strcmp(tasksplithalf(x), 'Odd_')
+            tasktxtline = [outfilewbtask ' ' subject ' Odd_'];
+            if ~exist('oddtasktxtfile')
+                oddtasktxtfile = tasktxtline;
+            else
+                oddtasktxtfile = [oddtasktxtfile; tasktxtline];
+            end
+        end
+    else
+        resttxtline = [outfilewbrest ' ' subject ' ' threshold];
+        tasktxtline = [outfilewbtask ' ' subject ' ' threshold];
+        if ~exist('restouttxtfile')
+            resttxtfile = resttxtline;
+        else
+            resttxtfile = [resttxtfile; resttxtline];
+        end
+        if ~exist('taskouttxtfile')
+            tasktxtfile = tasktxtline;
+        else
+            tasktxtfile = [tasktxtfile; tasktxtline];
+        end
+    end
 end
-    
+%% writes txt files
+if SplitHalf == 1
+    writematrix(evenresttxtfile,sprintf('%sMSC_rest_varMaps_Even.txt',outfilepath));
+    writematrix(eventasktxtfile,sprintf('%sMSC_task_varMaps_Even.txt',outfilepath));
+    writematrix(oddresttxtfile,sprintf('%sMSC_rest_varMaps_Odd.txt',outfilepath));
+    writematrix(oddtasktxtfile,sprintf('%sMSC_task_varMaps_Odd.txt',outfilepath));
+else
+    writematrix(resttxtfile,sprintf('%sMSC_rest_varMaps.txt',outfilepath));
+    writematrix(tasktxtfile,sprintf('%sMSC_task_varMaps.txt',outfilepath));
+end
+
 function [cifti_rest_data cifti_task_data] = ExcludeVariantSize(cifti_rest_data, cifti_task_data, subject, threshold, exclusion_criteria)
 
     %This function excludes variants that are less than the minimum number
