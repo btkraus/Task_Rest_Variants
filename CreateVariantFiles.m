@@ -8,13 +8,13 @@ clear all
 %% Paths
 %change paths
 workbenchdir = '/Applications/workbench/bin_macosx64/';
-leftsurf = '/Users/dianaperez/Box/Dependencies/32k_ConteAtlas_v2_distribute/Conte69.L.midthickness.32k_fs_LR.surf.gii';
-rightsurf = '/Users/dianaperez/Box/Dependencies/32k_ConteAtlas_v2_distribute/Conte69.R.midthickness.32k_fs_LR.surf.gii';
-dirpath = '/Users/dianaperez/Documents/GitHub/Task_Rest_Variants/';
+leftsurf = '/Users/diana/Box/Dependencies/32k_ConteAtlas_v2_distribute/Conte69.L.midthickness.32k_fs_LR.surf.gii';
+rightsurf = '/Users/diana/Box/Dependencies/32k_ConteAtlas_v2_distribute/Conte69.R.midthickness.32k_fs_LR.surf.gii';
+dirpath = '/Users/diana/Documents/GitHub/Task_Rest_Variants/';
 resttxtname = 'MSC_rest_varmaps_even.txt';
 tasktxtname = 'MSC_task_varmaps_even.txt';
-SNRpath = '/Users/dianaperez/Box/Quest_Backup/member_directories/bkraus/BrianMSC';
-outfilepath = '/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Matched_Task_Data/TaskCat_Split_Half_Data/';
+SNRpath = '/Users/diana/Box/Quest_Backup/member_directories/bkraus/BrianMSC/dconn_task_files/SNR_Maps/';
+outfilepath = '/Users/diana/Box/Latest_Analysis_Replication/';
 
 %%
 threshold = 2.5;  %% Thresholds used to calculate variants (lowest % or correlation values)
@@ -80,7 +80,7 @@ SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR, 1 = excl
         end
         %%
         
-        if ExcludeBySize = 1 
+        if ExcludeBySize == 1 
             
             [cifti_rest.data, cifti_task.data] = ExcludeVariantSize(cifti_rest_final_dat, cifti_task_final_dat, subject, theshold);
             
