@@ -1,11 +1,11 @@
-parpool('local', 28)     %% Name of cluster profile for batch job
+parpool('local', 20)     %% Name of cluster profile for batch job
 
 %/davta/vnil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_motor_passvv2/
 %/data/nil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_mem_pass2/
 %/data/nil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_mixed_pass2/
 clear all
 
-outdir = '/projects/b1081/Brian_MSC/dconn_task_files';
+outdir = '/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_task_files';
 dataLocStem = '/MSC/TaskFC/';
 %subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC10'};
 subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC09','MSC10'};
@@ -13,9 +13,9 @@ tasks = {'motor','mem','mixed'};
 %tasks = {'mem'};
 
 CortexOnly = 1; %% Toggles whether to run correlations on cortex only
-SplitHalf = 1;  %% Toggles whether to create a separate file for odd/even sessions
+SplitHalf = 0;  %% Toggles whether to create a separate file for odd/even sessions
 MatchData = 1; %% Toggles whether to match the amount of data per task as the lowest value within each split-half
-RandSample = 1; %% Toggles whether to randomly sample data from each session
+RandSample = 0; %% Toggles whether to randomly sample data from each session
 MatchAcrossSubs = 1;  %% Toggles whether to match the amount of data across subjects
 MatchAcrossTasks = 0;  %% Toggles whether to match the amount of data across tasks
 ConcatenateTasks = 1;   %% Toggles whether to concatenate data for all tasks
@@ -55,7 +55,7 @@ if MatchData == 1 && MatchAcrossSubs == 1
 
     for n=1:numel(subs)
     
-        load (['/projects/b1081/Brian_MSC/QC_files/' subs{n} '_QCFile.mat']);
+        load (['/projects/b1081/member_directories/bkraus/Brian_MSC/QC_files/' subs{n} '_QCFile.mat']);
         
         memptsodd = [];
         motorptsodd = [];
@@ -166,7 +166,7 @@ for i=1:numel(subs)
         
     	if MatchData == 1 && SplitHalf == 1
             
-                load (['/projects/b1081/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
+                load (['/projects/b1081/member_directories/bkraus/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
         
                 memptsodd = [];
                 motorptsodd = [];
@@ -436,7 +436,7 @@ for i=1:numel(subs)
         elseif MatchData == 1
             
 
-                load (['/projects/b1081/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
+                load (['/projects/b1081/member_directories/bkraus/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
         
                 mempts = [];
                 motorpts = [];
@@ -740,7 +740,7 @@ for i=1:numel(subs)
         
         if SplitHalf == 1
             
-            timeseriestemplate = ft_read_cifti_mod('/projects/b1081/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
+            timeseriestemplate = ft_read_cifti_mod('/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
             timeseriestemplate.data = [];
             timeseriestemplate2 = timeseriestemplate;
         
@@ -759,7 +759,7 @@ for i=1:numel(subs)
             
         else
         
-            timeseriestemplate = ft_read_cifti_mod('/projects/b1081/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
+            timeseriestemplate = ft_read_cifti_mod('/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
             timeseriestemplate.data = [];
         
             timeseriestemplate.data = catData;
@@ -776,13 +776,15 @@ for i=1:numel(subs)
     if CortexOnly == 1
         
     	disp('Loading template: MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
-    	template = ft_read_cifti_mod('/projects/b1081/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');    
+    	template = ft_read_cifti_mod('/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');    
         
     else
     
-    	disp(sprintf('Reading %s: %s', [MSCciftidir '/' vcid], datestr(now)));
-    	template = ft_read_cifti_mod([MSCciftidir '/' vcid]);
-    
+    	%disp(sprintf('Reading %s: %s', [MSCciftidir '/' vcid], datestr(now)));
+    	%template = ft_read_cifti_mod([MSCciftidir '/' vcid]);
+        disp(sprintf('Reading %s: %s', '/projects/b1081/MSC/TaskFC/FCProc_MSC01_mem_pass2/cifti_timeseries_normalwall_native_freesurf/vc38671_LR_surf_subcort_333_32k_fsLR_smooth2.55.dtseries.nii', datestr(now)));
+        template = ft_read_cifti_mod('/projects/b1081/MSC/TaskFC/FCProc_MSC01_mem_pass2/cifti_timeseries_normalwall_native_freesurf/vc38671_LR_surf_subcort_333_32k_fsLR_smooth2.55.dtseries.nii');
+
     end
     
     template.data = [];
@@ -923,6 +925,25 @@ for i=1:numel(subs)
             outputfile2 = [subs{i} '_allTaskCat_OddSessions_cortex'];
             
         end
+        
+    elseif SplitHalf == 1 && ConcatenateTasks == 1 && CortexOnly == 1
+        
+        if MakeDconn == 1 
+            
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_allTaskCat_OddSessions_FullData_cortex'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_allTaskCat_OddSessions_FullData_cortex'],template)
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_allTaskCat_EvenSessions_FullData_cortex'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_allTaskCat_EvenSessions_FullData_cortex'],template2)
+        
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile1 = [subs{i} '_allTaskCat_EvenSessions_FullData_cortex'];
+            outputfile2 = [subs{i} '_allTaskCat_OddSessions_FullData_cortex'];
+            
+        end
     
     elseif ConcatenateTasks == 1 && CortexOnly == 1 && RandSample == 1
     
@@ -936,6 +957,21 @@ for i=1:numel(subs)
         if MakeVariantMap == 1
             
             outputfile = [subs{i} '_allTaskCat_cortex'];
+            
+        end
+        
+    elseif ConcatenateTasks == 1 && CortexOnly == 1
+        
+        if MakeDconn == 1 
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_allTaskCat_Consec_cortex'], datestr(now)));
+            ft_write_cifti_mod([outdir '/' subs{i} '_allTaskCat_Consec_cortex'],template)
+        
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile = [subs{i} '_allTaskCat_Consec_cortex'];
             
         end
         
@@ -987,8 +1023,8 @@ for i=1:numel(subs)
         
         if MakeVariantMap == 1
             
-            outputfile1 = [subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_EvenSessions_cortex'];
-            outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_OddSessions_cortex'];
+            outputfile1 = [subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_OddSessions_cortex'];
+            outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_EvenSessions_cortex'];
             
         end
         
@@ -1006,8 +1042,8 @@ for i=1:numel(subs)
         
         if MakeVariantMap == 1
             
-            outputfile1 = [subs{i} '_' tasks{j} '_matcheddata_Consec_EvenSessions_cortex'];
-            outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_Consec_OddSessions_cortex'];
+            outputfile1 = [subs{i} '_' tasks{j} '_matcheddata_Consec_OddSessions_cortex'];
+            outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_Consec_EvenSessions_cortex'];
             
         end
         
@@ -1025,8 +1061,8 @@ for i=1:numel(subs)
         
         if MakeVariantMap == 1
             
-            outputfile1 = [subs{i} '_' tasks{j} '_EvenSessions_cortex'];
-            outputfile2 = [subs{i} '_' tasks{j} '_OddSessions_cortex'];
+            outputfile1 = [subs{i} '_' tasks{j} '_OddSessions_cortex'];
+            outputfile2 = [subs{i} '_' tasks{j} '_EvenSessions_cortex'];
             
         end
         
@@ -1044,8 +1080,23 @@ for i=1:numel(subs)
         
         if MakeVariantMap == 1
             
-            outputfile1 = [subs{i} '_' tasks{j} '_EvenSessions_subcort'];
-            outputfile2 = [subs{i} '_' tasks{j} '_OddSessions_subcort'];
+            outputfile1 = [subs{i} '_' tasks{j} '_OddSessions_subcort'];
+            outputfile2 = [subs{i} '_' tasks{j} '_EvenSessions_subcort'];
+            
+        end
+        
+    elseif CortexOnly == 1 && MatchData == 1 && RandSample == 0
+        
+        if MakeDconn == 1 
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_AllSessions_Consec_cortex'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_AllSessions_Consec_cortex'],template)
+            
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile = [subs{i} '_' tasks{j} '_AllSessions_Consec_cortex'];
             
         end
         

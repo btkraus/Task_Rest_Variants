@@ -1,4 +1,4 @@
-parpool('local', 28)     %% Name of cluster profile for batch job
+parpool('local', 20)     %% Name of cluster profile for batch job
 
 %/davta/vnil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_motor_passvv2/
 %/data/nil-bluearc/GMT/Caterina/TaskFC/FCProc_MSC01_mem_pass2/
@@ -7,11 +7,11 @@ clear all
 
 RestOnly = 0; %% Toggles whether to only use resting data in dconn and not consider task data at all
 CortexOnly = 1; %% Toggles cortex only template on/off
-SplitHalf = 1;  %% Toggles whether to calculate rest for split-half of sessions
+SplitHalf = 0;  %% Toggles whether to calculate rest for split-half of sessions
 SubSample = 1;  %% Toggles subsampling of tmask on/off (for comparing task to rest)
-RandSample = 1; %% Toggles random subsampling of tmask on/off
+RandSample = 0; %% Toggles random subsampling of tmask on/off
 MatchData = 1; %% Toggles whether to match the amount of data per task as the lowest value within each split-half
-MatchAcrossTasks = 0; %% Toggles whether to match the amount of data across tasks (for concatenated task data)
+MatchAcrossTasks = 1; %% Toggles whether to match the amount of data across tasks (for concatenated task data)
 MatchAcrossSubs = 1;  %% Toggles whether to match the amount of data across subjects
 ConcatenateTasksMatch = 1; %% Toggles whether to calculate matched task data for concatenated tasks
 ConcatenateTaskData = 1; %% Toggles whether to concatenate task data within subjects
@@ -21,9 +21,9 @@ WriteDconn = 0; %% Toggles whether to write dconn to disk
 CreateVariant = 1; %% Toggles whether to create a variant map from dconn
 SaveTimeseries = 1;     %% Save concatenated timeseries for subject
 
-outdir = '/projects/b1081/Brian_MSC/dconn_task_files';
+outdir = '/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_task_files';
 dataLocStem = '/MSC/TaskFC/';
-%subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC10'};
+%subs = {'MSC03','MSC06'};
 subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC09','MSC10'};
 tasks = {'motor','mem','mixed'};
 %tasks = {'motor'};
@@ -77,7 +77,7 @@ if MatchData == 1 && MatchAcrossSubs == 1
 
     for n=1:numel(subs)
     
-        load (['/projects/b1081/Brian_MSC/QC_files/' subs{n} '_QCFile.mat']);
+        load (['/projects/b1081/member_directories/bkraus/Brian_MSC/QC_files/' subs{n} '_QCFile.mat']);
         
         memptsodd = [];
         motorptsodd = [];
@@ -162,7 +162,7 @@ if MatchData == 1 && MatchAcrossSubs == 1
      
     if ConcatenateTaskData == 1
          
-         %mintasksamps = mintasksamps * numel(tasks);
+         mintasksamps = mintasksamps * numel(taskbackup);
          
     end
     
@@ -189,13 +189,13 @@ for i=1:numel(subs)
                     
                 end
                  
-                load(['/projects/b1081/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
+                load(['/projects/b1081/member_directories/bkraus/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
                   
             else
                 
                 if MatchAcrossSubs == 1
                 
-                    load(['/projects/b1081/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
+                    load(['/projects/b1081/member_directories/bkraus/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
                 
                     sampspersession = zeros(length(SubStruct),1);
                 
@@ -427,7 +427,7 @@ for i=1:numel(subs)
                                         if SubStruct(c).MixedSampPts < tasksampspersession(c) && notenoughdatatask(c) == 0
 
                                             notenoughdatatask(c) = 1;
-                                            remaindereventask = (remaindereventask + (tasksampspersession(c) - SubStruct(c).MemSampPts));
+                                            remaindereventask = (remaindereventask + (tasksampspersession(c) - SubStruct(c).MixedSampPts));
                                             tasksampspersession(c) = SubStruct(c).MixedSampPts;
 
                                             disp(sprintf('For subject %s and session %s there are not enough sample points for the task, sampling only %i sample points from this session: %s', subs{i}, SubStruct(c).SessionFile, tasksampspersession(c), datestr(now)));
@@ -448,11 +448,11 @@ for i=1:numel(subs)
                                         
                                     elseif strcmp(taskbackup{h},'motor')
                                         
-                                        if SubStruct(c).MixedSampPts < tasksampspersession(c) && notenoughdatatask(c) == 0
+                                        if SubStruct(c).MotorSampPts < tasksampspersession(c) && notenoughdatatask(c) == 0
 
                                             notenoughdatatask(c) = 1;
-                                            remaindereventask = (remaindereventask + (tasksampspersession(c) - SubStruct(c).MemSampPts));
-                                            tasksampspersession(c) = SubStruct(c).MixedSampPts;
+                                            remaindereventask = (remaindereventask + (tasksampspersession(c) - SubStruct(c).MotorSampPts));
+                                            tasksampspersession(c) = SubStruct(c).MotorSampPts;
 
                                             disp(sprintf('For subject %s and session %s there are not enough sample points for the task, sampling only %i sample points from this session: %s', subs{i}, SubStruct(c).SessionFile, tasksampspersession(c), datestr(now)));
 
@@ -464,7 +464,7 @@ for i=1:numel(subs)
 
                                         else
 
-                                            tasksampspersession(c) = SubStruct(c).MixedSampPts;
+                                            tasksampspersession(c) = SubStruct(c).MotorSampPts;
 
                                             disp(sprintf('For subject %s and session %s there are not enough sample points in the task data, sampling only %i sample points from this session: %s', subs{i}, SubStruct(c).SessionFile, tasksampspersession(c), datestr(now)));
 
@@ -688,7 +688,7 @@ for i=1:numel(subs)
     
             if MatchData == 1 && ConcatenateTasksMatch == 1 && SplitHalf == 1 && MatchAcrossSubs == 0
         
-                load (['/projects/b1081/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
+                load (['/projects/b1081/member_directories/bkraus/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
         
                 memptsodd = [];
                 motorptsodd = [];
@@ -1109,7 +1109,7 @@ for i=1:numel(subs)
             
             if MatchData == 1 && ConcatenateTasksMatch == 0 && SplitHalf == 1
         
-                load (['/projects/b1081/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
+                load (['/projects/b1081/member_directories/bkraus/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
         
                 memptsodd = [];
                 motorptsodd = [];
@@ -1771,7 +1771,7 @@ for i=1:numel(subs)
             
             if SplitHalf == 1
                 
-                timeseriestemplate = ft_read_cifti_mod('/projects/b1081/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
+                timeseriestemplate = ft_read_cifti_mod('/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
                 timeseriestemplate.data = [];
                 timeseriestemplate2 = timeseriestemplate;
                 
@@ -1791,7 +1791,7 @@ for i=1:numel(subs)
                 
             else
         
-                timeseriestemplate = ft_read_cifti_mod('/projects/b1081/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
+                timeseriestemplate = ft_read_cifti_mod('/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
                 timeseriestemplate.data = [];
         
                 timeseriestemplate.data = catData;
@@ -1809,14 +1809,13 @@ for i=1:numel(subs)
         if CortexOnly == 1
         
             disp('Loading template: MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
-            template = ft_read_cifti_mod('/projects/b1081/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');    
+            template = ft_read_cifti_mod('/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');    
         
         else
     
-            disp(sprintf('Reading %s: %s', [MSCciftidir '/' vcid], datestr(now)));
-            template = ft_read_cifti_mod([MSCciftidir '/' vcid]);
-    
-    
+            disp(sprintf('Reading %s: %s', '/projects/b1081/MSC/TaskFC/FCProc_MSC01_mem_pass2/cifti_timeseries_normalwall_native_freesurf/vc38671_LR_surf_subcort_333_32k_fsLR_smooth2.55.dtseries.nii', datestr(now)));
+            template = ft_read_cifti_mod('/projects/b1081/MSC/TaskFC/FCProc_MSC01_mem_pass2/cifti_timeseries_normalwall_native_freesurf/vc38671_LR_surf_subcort_333_32k_fsLR_smooth2.55.dtseries.nii');
+
         end
         
     
