@@ -1,8 +1,3 @@
-%%Questions: Have you decided if will include AnyOverlap or COMOverlap in
-%%paper? NOT included... Do I leave the option SubjectPlots? Do I keep the code for making a bar
-%%graph? No (line 1750)
-
-
 %% QuantifyVariantOverlap.m 
 %This script compares variant locations between rest-rest, task-task, rest-task
 %It makes plots that quantify how much they overlap between conditions
@@ -10,1544 +5,360 @@
 
 clear all
 
-%% Specify paths
+%% Paths
 % Specify output directories    
-outputdir = '/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Variant_Overlap_Plots/Thresholded_Plots';
-outputdirsub = '/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Variant_Overlap_Plots/Thresholded_Plots/Subject_Plots';
-dirpath = '/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/';
-
-
+outputdir = '/Users/dianaperez/Box/Latest_Analysis_Replication/Variant_Overlap_Plots/Thresholded_Plots/';
+dirpath = '/Users/dianaperez/Documents/GitHub/Task_Rest_Variants/'; %location of txt files
+% names of txt files
+spCorrRestEvenTxt = 'MSC_rest_spCorrMaps_Even.txt';
+spCorrRestOddTxt = 'MSC_rest_spCorrMaps_Odd.txt';
+spCorrTaskEvenTxt = 'MSC_task_spCorrMaps_Even.txt';
+spCorrTaskOddTxt = 'MSC_task_spCorrMaps_Odd.txt';
+varMapsRestEvenTxt = 'MSC_rest_varMaps_Even.txt';
+varMapsRestOddTxt = 'MSC_rest_varMaps_Odd.txt';
+varMapsTaskEvenTxt = 'MSC_task_varMaps_Even.txt';
+varMapsTaskOddTxt = 'MSC_task_varMaps_Odd.txt';
+if ~isfolder(outputdir)
+    mkdir(outputdir) % creates output directory if it doesn't already exist
+end
 %% Specify these conditions
 DiceCorr = 1;  %% Toggles whether to calculate dice correlations for all subjects
-AnyOverlap = 0;  %% Toggles whether to calculate if any portion of a variant overlaps for all subjects
-COMOverlap = 0;  %% Toggles whether to calculate if the center of mass of each variant shows overlap
+%AnyOverlap = 0;  %% Toggles whether to calculate if any portion of a variant overlaps for all subjects
+%COMOverlap = 0;  %% Toggles whether to calculate if the center of mass of each variant shows overlap
 plotresults = 1;  %% Toggles whether to plot results for each comparison
 FullMaps = 0;  %% Toggles whether to use all task and rest data for each subject
 SplitHalf = 1;  %% Toggles whether to calculate a split-half 
 MatchedMaps = 1;  %% Toggles whether to use a matched amount of task and rest data for each subject
 SNRExclude = 1;  %% Toggles whether to use data excluded for low SNR
-SizeExclude = 1;  %% Toggles whether to exclude small variants
+%SizeExclude = 1;  %% Toggles whether to exclude small variants
 randomizevals = 1;  %% Toggles whether to calculate a null distribution across subjects
 permvals = 1; %% Toggles whether to calculate a permutation of all possible combinations instead of bootstrapping
-BarGraph = 0;  %% Toggles whether to plot a bar graph for the group level results
+%BarGraph = 0;  %% Toggles whether to plot a bar graph for the group level results
 BoxPlot = 1;  %% Toggles whether to plot a box plot for the group level results
 BoxPlotBySubject = 1;  %% Toggles whether to display boxplot by subjects instead of by comparison
 FinalFigure = 1;  %% Toggles whether to plot the final figure (Figure 1) for the paper
-SubjectPlots = 0;  %% Toggles whether to plot subject level results
+%SubjectPlots = 0;  %% Toggles whether to plot subject level results
 AbsoluteThresholds = 0;  %% Toggles whether thresholds are absolute values or percents
-thresholds = [2.5 10];  %% Sets the thresholds of files to load
+thresholds = [2.5];  %% Sets the thresholds of files to load
    
 %% Create variables for number of variants/average size    
-    NumVariantsTaskOdd = [];
-    NumVariantsTaskEven = [];
-    NumVariantsRestOdd = [];
-    NumVariantsRestEven = [];
-    MeanSizeVariantsTaskOdd = [];
-    MeanSizeVariantsTaskEven = [];
-    MeanSizeVariantsRestOdd = [];
-    MeanSizeVariantsRestEven = [];
-    MedianSizeVariantsTaskOdd = [];
-    MedianSizeVariantsTaskEven = [];
-    MedianSizeVariantsRestOdd = [];
-    MedianSizeVariantsRestEven = [];
+NumVariantsTaskOdd = [];
+NumVariantsTaskEven = [];
+NumVariantsRestOdd = [];
+NumVariantsRestEven = [];
+MeanSizeVariantsTaskOdd = [];
+MeanSizeVariantsTaskEven = [];
+MeanSizeVariantsRestOdd = [];
+MeanSizeVariantsRestEven = [];
+MedianSizeVariantsTaskOdd = [];
+MedianSizeVariantsTaskEven = [];
+MedianSizeVariantsRestOdd = [];
+MedianSizeVariantsRestEven = [];
 
 % this for-loop sets up variables to run dice correlations between task and
 % rest data for each threshold
-for v = 1:numel(thresholds)
-    
-        % Create temp variables for number of variants/average size
-        NumVariantsTaskOddTemp = [];
-        NumVariantsTaskEvenTemp = [];
-        NumVariantsRestOddTemp = [];
-        NumVariantsRestEvenTemp = [];
-        MeanSizeVariantsTaskOddTemp = [];
-        MeanSizeVariantsTaskEvenTemp = [];
-        MeanSizeVariantsRestOddTemp = [];
-        MeanSizeVariantsRestEvenTemp = [];
-        MedianSizeVariantsTaskOddTemp = [];
-        MedianSizeVariantsTaskEvenTemp = [];
-        MedianSizeVariantsRestOddTemp = [];
-        MedianSizeVariantsRestEvenTemp = [];
+for v = 1:numel(thresholds)    
+    % Create temp variables for number of variants/average size
+    NumVariantsTaskOddTemp = [];
+    NumVariantsTaskEvenTemp = [];
+    NumVariantsRestOddTemp = [];
+    NumVariantsRestEvenTemp = [];
+    MeanSizeVariantsTaskOddTemp = [];
+    MeanSizeVariantsTaskEvenTemp = [];
+    MeanSizeVariantsRestOddTemp = [];
+    MeanSizeVariantsRestEvenTemp = [];
+    MedianSizeVariantsTaskOddTemp = [];
+    MedianSizeVariantsTaskEvenTemp = [];
+    MedianSizeVariantsRestOddTemp = [];
+    MedianSizeVariantsRestEvenTemp = [];
 
-        %what are these?
-        alltaskfilestaskeven = [];
-        alltaskfilestaskodd = [];
-        alltaskfilesresteven = [];
-        alltaskfilesrestodd = [];
+    %what are these?
+    alltaskfilestaskeven = [];
+    alltaskfilestaskodd = [];
+    alltaskfilesresteven = [];
+    alltaskfilesrestodd = [];
 
-        % specify .txt files 
-        [task_files_even, ~, ~] = textread([dirpath 'MSC_task_varmaps_' num2str(thresholds(v)) '_splithalf_even_matched_variants_SNRexclude.txt'],'%s%s%s');
+    % specify .txt files 
+    [task_files_even, ~, ~] = textread([dirpath spCorrTaskEvenTxt],'%s%s%s');
+    [rest_files_even, ~, ~] = textread([dirpath spCorrRestEvenTxt],'%s%s%s');    
+    [task_files_odd, subjects1, tasks1] = textread([dirpath spCorrTaskOddTxt],'%s%s%s');
+    [rest_files_odd, subjects2, tasks2] = textread([dirpath spCorrRestOddTxt],'%s%s%s');
+    [task_masks_even, ~, ~] = textread([dirpath varMapsTaskEvenTxt],'%s%s%s');
+    [rest_masks_even, ~, ~] = textread([dirpath varMapsRestEvenTxt],'%s%s%s');
+    [task_masks_odd, sub1, t1] = textread([dirpath varMapsTaskOddTxt],'%s%s%s');
+    [rest_masks_odd, sub2, t2] = textread([dirpath varMapsRestOddTxt],'%s%s%s');
 
-        [rest_files_even, ~, ~] = textread([dirpath 'MSC_rest_varmaps_' num2str(thresholds(v)) '_splithalf_even_matched_variants_SNRexclude.txt'],'%s%s%s');
-    
-        [task_files_odd, subjects1, tasks1] = textread([dirpath 'MSC_alltask_varmaps_' num2str(thresholds(v)) '_splithalf_odd_matched_variants_SNRexclude.txt'],'%s%s%s');
-
-        [rest_files_odd, subjects2, tasks2] = textread([dirpath 'MSC_rest_varmaps_' num2str(thresholds(v)) '_splithalf_odd_matched_variants_SNRexclude.txt'],'%s%s%s');
-    
-        [task_masks_even, ~, ~] = textread([dirpath 'MSC_alltask_varmaps_' num2str(thresholds(v)) '_splithalf_even_matched_variants_SNRexclude_sizeexclude.txt'],'%s%s%s');
-
-        [rest_masks_even, ~, ~] = textread([dirpath 'MSC_rest_varmaps_' num2str(thresholds(v)) '_splithalf_even_matched_variants_SNRexclude_sizeexclude.txt'],'%s%s%s');
-    
-        [task_masks_odd, sub1, t1] = textread([dirpath 'MSC_alltask_varmaps_' num2str(thresholds(v)) '_splithalf_odd_matched_variants_SNRexclude_sizeexclude.txt'],'%s%s%s');
-
-        [rest_masks_odd, sub2, t2] = textread([dirpath 'MSC_rest_varmaps_' num2str(thresholds(v)) '_splithalf_odd_matched_variants_SNRexclude_sizeexclude.txt'],'%s%s%s');
-
-        % create temp variables for dice correlations
-        DiceCorrsTaskRest = [];
-        DiceCorrsTaskTask = [];
-        DiceCorrsRestRest = [];
-     
-    end
+    % create temp variables for dice correlations
+    DiceCorrsTaskRest = [];
+    DiceCorrsTaskTask = [];
+    DiceCorrsRestRest = [];
+end
 
 % sets up number of files for for-loop
 nfiles = length(rest_files_even);
     
 
-    for x = 1:nfiles
+for x = 1:nfiles
 
-        subject = subjects2{x};
-   
-        % reads cifti files from .txt file paths
-        cifti_rest_even = ft_read_cifti_mod(rest_files_even{x});
-        cifti_task_even = ft_read_cifti_mod(task_files_even{x});
-        cifti_rest_odd = ft_read_cifti_mod(rest_files_odd{x});
-        cifti_task_odd = ft_read_cifti_mod(task_files_odd{x});
-      
-         %% Apply exclusion masks for maps that exclude size
-            cifti_rest_mask_even = ft_read_cifti_mod(rest_masks_even{x});
-            cifti_task_mask_even = ft_read_cifti_mod(task_masks_even{x});
-            cifti_rest_mask_odd = ft_read_cifti_mod(rest_masks_odd{x});
-            cifti_task_mask_odd = ft_read_cifti_mod(task_masks_odd{x});
+    subject = subjects2{x};
 
-            for d = 1:length(cifti_rest_mask_even.data)
-                if cifti_rest_mask_even.data(d) == 0
-                    cifti_rest_even.data(d) = 0;
-                end
-                if cifti_rest_mask_odd.data(d) == 0
-                    cifti_rest_odd.data(d) = 0;
-                end  
-            end
-            
-            for e = 1:length(cifti_task_mask_even.data)
-                if cifti_task_mask_even.data(e) == 0
-                    cifti_task_even.data(e) = 0;
-                end
-                if cifti_task_mask_odd.data(e) == 0
-                    cifti_task_odd.data(e) = 0;
-                end
-            end
-            
-    
-  %% Get number of variants and mean/median size, put it at end of variant making script
-        
-            vars_rest_even = unique(cifti_rest_even.data);
-            vars_rest_even(1) = [];
-            vars_rest_odd = unique(cifti_rest_odd.data);
-            vars_rest_odd(1) = [];
-            vars_task_even = unique(cifti_task_even.data);
-            vars_task_even(1) = [];
-            vars_task_odd = unique(cifti_task_odd.data);
-            vars_task_odd(1) = [];
-            
-            NumVariantsTaskOddTemp = [NumVariantsTaskOddTemp; length(vars_task_odd)];
-            NumVariantsTaskEvenTemp = [NumVariantsTaskEvenTemp; length(vars_task_even)];
-            NumVariantsRestOddTemp = [NumVariantsRestOddTemp; length(vars_rest_odd)];
-            NumVariantsRestEvenTemp = [NumVariantsRestEvenTemp; length(vars_rest_even)];
-            MeanSizeVariantsTaskOddTemp = [MeanSizeVariantsTaskOddTemp; length(find(cifti_task_odd.data > 0))/length(vars_task_odd)];
-            MeanSizeVariantsTaskEvenTemp = [MeanSizeVariantsTaskEvenTemp; length(find(cifti_task_even.data > 0))/length(vars_task_even)];
-            MeanSizeVariantsRestOddTemp = [MeanSizeVariantsRestOddTemp; length(find(cifti_rest_odd.data > 0))/length(vars_rest_odd)];
-            MeanSizeVariantsRestEvenTemp = [MeanSizeVariantsRestEvenTemp; length(find(cifti_rest_even.data > 0))/length(vars_rest_even)];
-            
-            vars_rest_size_even = zeros(length(vars_rest_even),1);
-            vars_rest_size_odd = zeros(length(vars_rest_odd),1);
-            vars_task_size_even = zeros(length(vars_task_even),1);
-            vars_task_size_odd = zeros(length(vars_task_odd),1);
-            
-            for k = 1:length(vars_rest_even)
-            
-                vars_rest_size_even(k) = length(find(cifti_rest_even.data == vars_rest_even(k)));
-                
-            end
-            
-            for k = 1:length(vars_rest_odd)
-            
-                vars_rest_size_odd(k) = length(find(cifti_rest_odd.data == vars_rest_odd(k)));
-                
-            end
-            
-            for k = 1:length(vars_task_even)
-            
-                vars_task_size_even(k) = length(find(cifti_task_even.data == vars_task_even(k)));
-                
-            end
-            
-            for k = 1:length(vars_task_odd)
-            
-                vars_task_size_odd(k) = length(find(cifti_task_odd.data == vars_task_odd(k)));
-                
-            end
-            
-            MedianSizeVariantsTaskOddTemp = [MedianSizeVariantsTaskOddTemp; median(vars_task_size_odd)];
-            MedianSizeVariantsTaskEvenTemp = [MedianSizeVariantsTaskEvenTemp; median(vars_task_size_even)];
-            MedianSizeVariantsRestOddTemp = [MedianSizeVariantsRestOddTemp; median(vars_rest_size_odd)];
-            MedianSizeVariantsRestEvenTemp = [MedianSizeVariantsRestEvenTemp; median(vars_rest_size_even)];
-        %% end of descriptive stats part
-       
-            %% dice correlations
-                dcorrdatataskrest1 = [];
-                dcorrdatataskrest2 = [];
-                dcorrdatarestrest = [];
-                dcorrdatatasktask = [];
+    %% Reads cifti files from .txt file paths
+    % spatial correlation maps
+    cifti_rest_even = ft_read_cifti_mod(rest_files_even{x});
+    cifti_task_even = ft_read_cifti_mod(task_files_even{x});
+    cifti_rest_odd = ft_read_cifti_mod(rest_files_odd{x});
+    cifti_task_odd = ft_read_cifti_mod(task_files_odd{x});
+    % variant maps  
+    cifti_rest_mask_even = ft_read_cifti_mod(rest_masks_even{x});
+    cifti_task_mask_even = ft_read_cifti_mod(task_masks_even{x});
+    cifti_rest_mask_odd = ft_read_cifti_mod(rest_masks_odd{x});
+    cifti_task_mask_odd = ft_read_cifti_mod(task_masks_odd{x});
 
-                for q = 1:length(cifti_rest_even.data)      %% Task-Rest Comparison 1
-            
-                    if cifti_rest_even.data(q) > 0 && cifti_task_odd.data(q) > 0
-                
-                        dcorrdatataskrest1 = [dcorrdatataskrest1;1 1];
-                
-                    elseif cifti_rest_even.data(q) > 0
-                
-                        dcorrdatataskrest1 = [dcorrdatataskrest1;1 0];
-                
-                    elseif cifti_task_odd.data(q) > 0
-                
-                        dcorrdatataskrest1 = [dcorrdatataskrest1;0 1];
-                
-                    end
-            
-                end
-                
-                for q = 1:length(cifti_rest_odd.data)      %% Task-Rest Comparison 2
-            
-                    if cifti_rest_odd.data(q) > 0 && cifti_task_even.data(q) > 0
-                
-                        dcorrdatataskrest2 = [dcorrdatataskrest2;1 1];
-                
-                    elseif cifti_rest_even.data(q) > 0
-                
-                        dcorrdatataskrest2 = [dcorrdatataskrest2;1 0];
-                
-                    elseif cifti_task_odd.data(q) > 0
-                
-                        dcorrdatataskrest2 = [dcorrdatataskrest2;0 1];
-                
-                    end
-            
-                end
-            
-                for q = 1:length(cifti_rest_odd.data)       %% Rest-Rest Comparison
-            
-                    if cifti_rest_odd.data(q) > 0 && cifti_rest_even.data(q) > 0
-                
-                        dcorrdatarestrest = [dcorrdatarestrest;1 1];
-                
-                    elseif cifti_rest_odd.data(q) > 0
-                
-                        dcorrdatarestrest = [dcorrdatarestrest;1 0];
-                
-                    elseif cifti_rest_even.data(q) > 0
-                
-                        dcorrdatarestrest = [dcorrdatarestrest;0 1];
-                
-                    end
-            
-                end
-            
-                for q = 1:length(cifti_task_odd.data)       %% Task-Task Comparison            
-                    if cifti_task_odd.data(q) > 0 && cifti_task_even.data(q) > 0
-                        dcorrdatatasktask = [dcorrdatatasktask;1 1];
-                    elseif cifti_task_odd.data(q) > 0
-                        dcorrdatatasktask = [dcorrdatatasktask;1 0];
-                    elseif cifti_task_even.data(q) > 0
-                        dcorrdatatasktask = [dcorrdatatasktask;0 1];
-                    end
-            
-                end
-                
-                % if empty (due to low threshold or high size exclusion), then set dice corr to 0
-                if isempty(dcorrdatataskrest1)
-                    dctaskrest1 = 0;
-                else                   
-                    dctaskrest1 = dice_coefficient_mod(dcorrdatataskrest1(:,1),dcorrdatataskrest1(:,2));                    
-                end
-                
-                if isempty(dcorrdatataskrest2)                    
-                    dctaskrest2 = 0;
-                else
-                    dctaskrest2 = dice_coefficient_mod(dcorrdatataskrest2(:,1),dcorrdatataskrest2(:,2));
-                end
-                
-                if isempty(dcorrdatarestrest)
-                    dcrestrest = 0;
-                else
-                    dcrestrest = dice_coefficient_mod(dcorrdatarestrest(:,1),dcorrdatarestrest(:,2));
-                end
-                
-                if isempty(dcorrdatatasktask)
-                    dctasktask = 0;
-                else
-                    dctasktask = dice_coefficient_mod(dcorrdatatasktask(:,1),dcorrdatatasktask(:,2));
-                end
-        
-                DiceCorrsTaskRest = [DiceCorrsTaskRest; [dctaskrest1 dctaskrest2]];
-                DiceCorrsTaskTask = [DiceCorrsTaskTask; dctasktask];
-                DiceCorrsRestRest = [DiceCorrsRestRest; dcrestrest];
-            
-%% will decide if will be included in the paper
-%         if AnyOverlap == 1
-%         
-%             if SplitHalf == 1
-%             
-%                 overlapvarstaskrest = [];
-%                 overlapvarstasktask = [];
-%                 overlapvarsrestrest = [];
-%         
-%                 for r = 1:length(vars_rest_even)     %% Task-Rest Comparison
-%             
-%                     for s = 1:length(cifti_rest_even.data)
-%             
-%                         if cifti_rest_even.data(s) == vars_rest_even(r) && cifti_task_odd.data(s) > 0
-%                 
-%                             overlapvarstaskrest = [overlapvarstaskrest;vars_rest_even(r) cifti_task_odd.data(s)];
-%                 
-%                         end
-%                 
-%                     end
-%                 end
-%             
-%                 for r = 1:length(vars_task_odd)        %% Task-Task Comparison
-%             
-%                     for s = 1:length(cifti_task_odd.data)
-%             
-%                         if cifti_task_odd.data(s) == vars_task_odd(r) && cifti_task_even.data(s) > 0
-%                 
-%                             overlapvarstasktask = [overlapvarstasktask;vars_task_odd(r) cifti_task_even.data(s)];
-%                 
-%                         end
-%                 
-%                     end
-%                 end
-%             
-%                 for r = 1:length(vars_rest_odd)        %% Rest-Rest Comparison
-%             
-%                     for s = 1:length(cifti_rest_odd.data)
-%             
-%                         if cifti_rest_odd.data(s) == vars_rest_odd(r) && cifti_rest_even.data(s) > 0
-%                 
-%                             overlapvarsrestrest = [overlapvarsrestrest;vars_rest_odd(r) cifti_rest_even.data(s)];
-%                 
-%                         end
-%                 
-%                     end
-%                 end
-%                 
-%                 if isempty(overlapvarstasktask) && isempty(overlapvarsrestrest) && isempty(overlapvarstaskrest)
-%                         
-%                     NumOverlapTaskRest = [NumOverlapTaskRest; 0];
-%                     NumOverlapTaskTask = [NumOverlapTaskTask; 0];
-%                     NumOverlapRestRest = [NumOverlapRestRest; 0];
-%                         
-%                 elseif isempty(overlapvarsrestrest) && isempty(overlapvarstaskrest)
-%                         
-%                     NumOverlapTaskRest = [NumOverlapTaskRest; 0];
-%                     NumOverlapRestRest = [NumOverlapRestRest; 0];
-%                     NumOverlapTaskTask = [NumOverlapTaskTask; (length(unique(overlapvarstasktask(:,1))) + length(unique(overlapvarstasktask(:,2))))/(length(vars_task_odd) + length(vars_task_even))];
-%                         
-%                 elseif isempty(overlapvarstasktask) && isempty(overlapvarstaskrest)
-%                         
-%                  	NumOverlapTaskRest = [NumOverlapTaskRest; 0];
-%                     NumOverlapTaskTask = [NumOverlapTaskTask; 0];
-%                     NumOverlapRestRest = [NumOverlapRestRest; (length(unique(overlapvarsrestrest(:,1))) + length(unique(overlapvarsrestrest(:,2))))/(length(vars_rest_odd) + length(vars_rest_even))];
-%                   
-%                 elseif isempty(overlapvarsrestrest) && isempty(overlapvarstasktask)
-%                     
-%                     NumOverlapTaskTask = [NumOverlapTaskTask; 0];
-%                     NumOverlapRestRest = [NumOverlapRestRest; 0];
-%                     NumOverlapTaskRest = [NumOverlapTaskRest; (length(unique(overlapvarstaskrest(:,1))) + length(unique(overlapvarstaskrest(:,2))))/(length(vars_rest_odd) + length(vars_task_even))];
-%                     
-%                 elseif isempty(overlapvarsrestrest)
-%                     
-%                     NumOverlapRestRest = [NumOverlapRestRest; 0];
-%                     NumOverlapTaskTask = [NumOverlapTaskTask; (length(unique(overlapvarstasktask(:,1))) + length(unique(overlapvarstasktask(:,2))))/(length(vars_task_odd) + length(vars_task_even))];
-%                     NumOverlapTaskRest = [NumOverlapTaskRest; (length(unique(overlapvarstaskrest(:,1))) + length(unique(overlapvarstaskrest(:,2))))/(length(vars_rest_odd) + length(vars_task_even))];
-%                     
-%                 elseif isempty(overlapvarstasktask)
-%                     
-%                     NumOverlapTaskTask = [NumOverlapTaskTask; 0];
-%                     NumOverlapTaskRest = [NumOverlapTaskRest; (length(unique(overlapvarstaskrest(:,1))) + length(unique(overlapvarstaskrest(:,2))))/(length(vars_rest_odd) + length(vars_task_even))];
-%                     NumOverlapRestRest = [NumOverlapRestRest; (length(unique(overlapvarsrestrest(:,1))) + length(unique(overlapvarsrestrest(:,2))))/(length(vars_rest_odd) + length(vars_rest_even))];
-%                     
-%                 elseif isempty(overlapvarstaskrest)
-%                     
-%                     NumOverlapTaskRest = [NumOverlapTaskRest; 0];
-%                     NumOverlapTaskTask = [NumOverlapTaskTask; (length(unique(overlapvarstasktask(:,1))) + length(unique(overlapvarstasktask(:,2))))/(length(vars_task_odd) + length(vars_task_even))];
-%                     NumOverlapRestRest = [NumOverlapRestRest; (length(unique(overlapvarsrestrest(:,1))) + length(unique(overlapvarsrestrest(:,2))))/(length(vars_rest_odd) + length(vars_rest_even))];
-%                     
-%                 else
-%         
-%                     NumOverlapTaskRest = [NumOverlapTaskRest; (length(unique(overlapvarstaskrest(:,1))) + length(unique(overlapvarstaskrest(:,2))))/(length(vars_rest_odd) + length(vars_task_even))];
-%                     NumOverlapTaskTask = [NumOverlapTaskTask; (length(unique(overlapvarstasktask(:,1))) + length(unique(overlapvarstasktask(:,2))))/(length(vars_task_odd) + length(vars_task_even))];
-%                     NumOverlapRestRest = [NumOverlapRestRest; (length(unique(overlapvarsrestrest(:,1))) + length(unique(overlapvarsrestrest(:,2))))/(length(vars_rest_odd) + length(vars_rest_even))];
-%                         
-%                 end
-%             
-%             else
-   
-   %%comment this out too
-%                 overlapvars = [];
-%         
-%                 for r = 1:length(vars_rest)
-%             
-%                     for s = 1:length(cifti_rest.data)
-%             
-%                         if cifti_rest.data(s) == vars_rest(r) && cifti_task.data(s) > 0
-%                 
-%                             overlapvars = [overlapvars;vars_rest(r) cifti_task.data(s)];
-%                 
-%                         end
-%                 
-%                     end
-%                 end
-%             
-%                 NumOverlap = [NumOverlap; (length(unique(overlapvars(:,1))) + length(unique(overlapvars(:,2))))/(length(vars_rest) + length(vars_task))];
-%             
-% %             end
+    %% Leaves only correlations for vertices belonging to variants
+    for d = 1:length(cifti_rest_mask_even.data)
+        if cifti_rest_mask_even.data(d) == 0
+            cifti_rest_even.data(d) = 0;
         end
-
-%%will decide if this will be included in the paper 
-%         if COMOverlap == 1
-%         
-%             if SplitHalf == 1
-%             
-%                 for z = 1:3     %% Loops over 3 comparisons (rest-task, rest-rest, task-task)
-%             
-%                     %meanvals = [];
-%                     COMOverlapsresttemp = [];
-%                     COMOverlapstasktemp = [];
-%                 
-%                     if z == 1  %% Task-Rest
-%         
-%                         taskverts = find(cifti_task_odd.data > 0);
-%                         restverts = find(cifti_rest_even.data > 0);
-%                     
-%                     elseif z == 2  %% Task-Task
-%                     
-%                         taskverts = find(cifti_task_even.data > 0);
-%                         restverts = find(cifti_task_odd.data > 0);
-%                     
-%                     elseif z == 3  %% Rest-Rest
-%                     
-%                         taskverts = find(cifti_rest_even.data > 0);
-%                         restverts = find(cifti_rest_odd.data > 0);
-%                     
-%                     end
-%         
-%                     for a = 1:2   %% loop over task and rest
-%             
-%                         if a == 1   %% Rest
-%                         
-%                             if z == 1   %% Task-Rest
-%                 
-%                                 nvars = length(vars_rest_even);
-%                         
-%                             elseif z == 2   %% Task-Task
-%                             
-%                                 nvars = length(vars_task_odd);
-%                             
-%                             elseif z == 3   %% Rest-Rest
-%                             
-%                                 nvars = length(vars_rest_odd);
-%                             
-%                             end
-%                 
-%                         else       %% Task
-%                 
-%                             if z == 1   %% Task-Rest
-%                 
-%                                 nvars = length(vars_task_odd);
-%                         
-%                             elseif z == 2   %% Task-Task
-%                             
-%                                 nvars = length(vars_task_even);
-%                             
-%                             elseif z == 3   %% Rest-Rest
-%                             
-%                                 nvars = length(vars_rest_even);
-%                             
-%                             end
-%                 
-%                         end
-%         
-%                         for s = 1:nvars
-%                 
-%                             if a == 1   %% Rest
-%                             
-%                                 if z == 1   %% Task-Rest
-%                 
-%                                     currentvariant = find(cifti_rest_even.data == vars_rest_even(s));
-%                         
-%                                 elseif z == 2   %% Task-Task
-% 
-%                                     currentvariant = find(cifti_task_odd.data == vars_task_odd(s));
-%                             
-%                                 elseif z == 3   %% Rest-Rest
-% 
-%                                     currentvariant = find(cifti_rest_odd.data == vars_rest_odd(s));
-%                             
-%                                 end
-%                 
-%                             else   %% Task
-%                     
-%                                 if z == 1   %% Task-Rest
-%                 
-%                                     currentvariant = find(cifti_task_odd.data == vars_task_odd(s));
-%                         
-%                                 elseif z == 2   %% Task-Task
-% 
-%                                     currentvariant = find(cifti_task_even.data == vars_task_even(s));
-%                             
-%                                 elseif z == 3   %% Rest-Rest
-% 
-%                                     currentvariant = find(cifti_rest_even.data == vars_rest_even(s));
-%                             
-%                                 end
-%                     
-%                             end
-%                 
-%                             COMtemp = cifti_coords.data(currentvariant,:);
-%                 
-%                             if length(currentvariant) > 1
-%                     
-%                                 centroid = [];
-%                     
-%                                 for t = 1:length(currentvariant)
-%                         
-%                                     jacknifevals = 1:length(currentvariant);        %% Leaves current point out of calculation
-%                                     jacknifevals(t) = [];
-%                     
-%                                     % Euclidean distance
-%                                     dist = mean(sqrt(sum((COMtemp(jacknifevals,:) - COMtemp(t,:)).^2, 2)));
-%                         
-%                                     %meanvals = [meanvals; dist];
-%                         
-%                                     if isempty(centroid) || dist < centroid   %% If new distance less than current least distance, use as center
-%                             
-%                                         centroid = currentvariant(t);
-%                             
-%                                     end
-%                         
-%                                 end
-%                     
-%                                 centervariant = centroid;
-%                     
-%                             else
-%                     
-%                                 centervariant = currentvariant;
-%                     
-%                             end
-%                 
-%                             if a == 1
-%                 
-%                                 COMOverlapsresttemp = [COMOverlapsresttemp; centervariant];
-%                     
-%                             else
-%                     
-%                                 COMOverlapstasktemp = [COMOverlapstasktemp; centervariant];
-%                     
-%                             end 
-%                         end
-%                     end
-% 
-%         
-%                     Taskoverlaps = length(unique(intersect(COMOverlapstasktemp, restverts)));
-%                     Restoverlaps = length(unique(intersect(COMOverlapsresttemp, taskverts)));
-%                 
-%                     if z == 1   %% Task-Rest
-%         
-%                         COMOverlapsTaskRest = [COMOverlapsTaskRest; (Taskoverlaps + Restoverlaps)/(length(vars_rest_even) + length(vars_task_odd))];
-%                     
-%                     elseif z == 2  %% Task-Task
-%                     
-%                         COMOverlapsTaskTask = [COMOverlapsTaskTask; (Taskoverlaps + Restoverlaps)/(length(vars_task_even) + length(vars_task_odd))];
-%                     
-%                     elseif z == 3  %% Rest-Rest
-%                     
-%                         COMOverlapsRestRest = [COMOverlapsRestRest; (Taskoverlaps + Restoverlaps)/(length(vars_rest_even) + length(vars_rest_odd))];
-%                     
-%                     end
-%                 
-%                 end
-%             
-%             else
-%     
-%                 %meanvals = [];
-%                 COMOverlapsresttemp = [];
-%                 COMOverlapstasktemp = [];
-% 
-%                 taskverts = find(cifti_task.data > 0);
-%                 restverts = find(cifti_rest.data > 0);
-%         
-%                 for a = 1:2   %% loop over task and rest
-%             
-%                     if a == 1
-%                 
-%                         nvars = length(vars_rest);
-%                 
-%                     else
-%                 
-%                         nvars = length(vars_task);
-%                 
-%                     end
-%         
-%                     for s = 1:nvars
-%                 
-%                         if a == 1
-%             
-%                             currentvariant = find(cifti_rest.data == vars_rest(s));
-%                 
-%                         else
-%                     
-%                             currentvariant = find(cifti_task.data == vars_task(s));
-%                     
-%                         end
-%                 
-%                         COMtemp = cifti_coords.data(currentvariant,:);
-%                 
-%                         if length(currentvariant) > 1
-%                     
-%                             centroid = [];
-%                     
-%                             for t = 1:length(currentvariant)
-%                         
-%                                 jacknifevals = 1:length(currentvariant);        %% Leaves current point out of calculation
-%                                 jacknifevals(t) = [];
-%                     
-%                                 % Euclidean distance
-%                                 dist = mean(sqrt(sum((COMtemp(jacknifevals,:) - COMtemp(t,:)).^2, 2)));
-%                         
-%                                 %meanvals = [meanvals; dist];
-%                         
-%                                 if isempty(centroid) || dist < centroid   %% If new distance less than current least distance, use as center
-%                             
-%                                     centroid = currentvariant(t);
-%                             
-%                                 end
-%                         
-%                             end
-%                     
-%                             centervariant = centroid;
-%                     
-%                         else
-%                     
-%                             centervariant = currentvariant;
-%                     
-%                         end
-%                 
-%                         if a == 1
-%                 
-%                             COMOverlapsresttemp = [COMOverlapsresttemp; centervariant];
-%                     
-%                         else
-%                     
-%                             COMOverlapstasktemp = [COMOverlapstasktemp; centervariant];
-%                     
-%                         end 
-%                     end
-%                 end
-% 
-%         
-%                 Taskoverlaps = length(unique(intersect(COMOverlapstasktemp, restverts)));
-%                 Restoverlaps = length(unique(intersect(COMOverlapsresttemp, taskverts)));
-%         
-%                 COMOverlaps = [COMOverlaps; (Taskoverlaps + Restoverlaps)/(length(vars_rest) + length(vars_task))];
-%         
-%             end
-        
-        
-        % Find Euclidean distance between task and rest centroids
-        
-%         minval = [];
-%         
-%         for y = 1:length(COMOverlapsresttemp)
-%             
-%             % Euclidean distance
-%           	dist = sqrt(sum((cifti_coords.data(COMOverlapstasktemp,:) - cifti_coords.data(COMOverlapsresttemp(y),:)).^2, 2));
-%            
-%             minval = [minval dist];
-%             
-%         end
-        
-        % Exclude centroids from task/rest variants that are overlapping
-%         
-%         taskverts = find(cifti_task.data > 0);
-%         
-%         taskdata = cifti_task.data;
-%         restdata = cifti_rest.data;
-%         
-%         restvertsexclude = [];
-%         taskvertsexclude = [];
-% 
-%         for z = 1:length(COMOverlapsresttemp)
-%             
-%             if ismember(COMOverlapsresttemp(z), taskverts)
-%                 
-%                 taskvarianttemp = taskdata(COMOverlapsresttemp(z));
-%                 restvarianttemp = restdata(COMOverlapsresttemp(z));
-%                 
-%                 taskvarcount = length(find(taskdata == taskvarianttemp));
-%                 restvarcount = length(find(restdata == restvarianttemp));
-%                 
-%                 if taskvarcount < restvarcount
-%                     
-%                     taskvertsexclude = [taskvertsexclude; find(taskdata == taskvarianttemp)];
-%                     
-%                 elseif taskvarcount > restvarcount
-%                     
-%                     restvertsexclude = [restvertsexclude; find(restdata == restvarianttemp)];
-%                 end 
-%             end
-%         end
-%         
-%         for b = 1:length(COMOverlapsresttemp)
-%             
-%             ExcludeCOMrest = [];
-%             
-%             if ismember(COMOverlapsresttemp(b), restvertsexclude)
-%                 
-%                 ExcludeCOMrest = [ExcludeCOMrest; COMOverlapsresttemp(b)];
-%                 
-%             end
-%         end        
-%                 
-%         COMOverlapsresttemp(ExcludeCOM,:) = [];
-%         taskdata(taskvertsexclude,:) = [];
-%         restdata(restvertsexclude,:) = [];
-%         
-%         finaltaskvarcount = length(unique(find(taskdata > 0)));
-%         finalrestvarcount = length(unique(find(restdata > 0)));
-    
-%         end
-        
-
-        % saves SNR excluded data for each subject if you want to do permutations
-      	if randomizevals == 1 || SubjectPlots == 1
+        if cifti_rest_mask_odd.data(d) == 0
+            cifti_rest_odd.data(d) = 0;
+        end  
+    end
             
-         	if SplitHalf == 1
-                
-              	alltaskfilestaskeven = [alltaskfilestaskeven; cifti_task_even.data'];
-              	alltaskfilestaskodd = [alltaskfilestaskodd; cifti_task_odd.data'];
-              	alltaskfilesresteven = [alltaskfilesresteven; cifti_rest_even.data'];
-             	alltaskfilesrestodd = [alltaskfilesrestodd; cifti_rest_odd.data'];
-                
-            else
-                        
-             	alltaskfilestask = [alltaskfilestask; cifti_task.data'];
-              	alltaskfilesrest = [alltaskfilesrest; cifti_rest.data']; 
+    for e = 1:length(cifti_task_mask_even.data)
+        if cifti_task_mask_even.data(e) == 0
+            cifti_task_even.data(e) = 0;
+        end
+        if cifti_task_mask_odd.data(e) == 0
+            cifti_task_odd.data(e) = 0;
+        end
+    end
             
-            end
-                        
-      	end
+    
+    %% Get number of variants and mean/median size, put it at end of variant making script        
+    vars_rest_even = unique(cifti_rest_even.data);
+    vars_rest_even(1) = [];
+    vars_rest_odd = unique(cifti_rest_odd.data);
+    vars_rest_odd(1) = [];
+    vars_task_even = unique(cifti_task_even.data);
+    vars_task_even(1) = [];
+    vars_task_odd = unique(cifti_task_odd.data);
+    vars_task_odd(1) = [];
 
-%     end
-    
-    
-     %% Add temp variables to final variables, put these with descriptive stats
-    
-        NumVariantsTaskOdd = [NumVariantsTaskOdd NumVariantsTaskOddTemp];
-        NumVariantsTaskEven = [NumVariantsTaskEven NumVariantsTaskEvenTemp];
-        NumVariantsRestOdd = [NumVariantsRestOdd NumVariantsRestOddTemp];
-        NumVariantsRestEven = [NumVariantsRestEven NumVariantsRestEvenTemp];
-        MeanSizeVariantsTaskOdd = [MeanSizeVariantsTaskOdd MeanSizeVariantsTaskOddTemp];
-        MeanSizeVariantsTaskEven = [MeanSizeVariantsTaskEven MeanSizeVariantsTaskEvenTemp];
-        MeanSizeVariantsRestOdd = [MeanSizeVariantsRestOdd MeanSizeVariantsRestOddTemp];
-        MeanSizeVariantsRestEven = [MeanSizeVariantsRestEven MeanSizeVariantsRestEvenTemp];
-        MedianSizeVariantsTaskOdd = [MedianSizeVariantsTaskOdd MedianSizeVariantsTaskOddTemp];
-        MedianSizeVariantsTaskEven = [MedianSizeVariantsTaskEven MedianSizeVariantsTaskEvenTemp];
-        MedianSizeVariantsRestOdd = [MedianSizeVariantsRestOdd MedianSizeVariantsRestOddTemp];
-        MedianSizeVariantsRestEven = [MedianSizeVariantsRestEven MedianSizeVariantsRestEvenTemp];
-    
+    NumVariantsTaskOddTemp = [NumVariantsTaskOddTemp; length(vars_task_odd)];
+    NumVariantsTaskEvenTemp = [NumVariantsTaskEvenTemp; length(vars_task_even)];
+    NumVariantsRestOddTemp = [NumVariantsRestOddTemp; length(vars_rest_odd)];
+    NumVariantsRestEvenTemp = [NumVariantsRestEvenTemp; length(vars_rest_even)];
+    MeanSizeVariantsTaskOddTemp = [MeanSizeVariantsTaskOddTemp; length(find(cifti_task_odd.data > 0))/length(vars_task_odd)];
+    MeanSizeVariantsTaskEvenTemp = [MeanSizeVariantsTaskEvenTemp; length(find(cifti_task_even.data > 0))/length(vars_task_even)];
+    MeanSizeVariantsRestOddTemp = [MeanSizeVariantsRestOddTemp; length(find(cifti_rest_odd.data > 0))/length(vars_rest_odd)];
+    MeanSizeVariantsRestEvenTemp = [MeanSizeVariantsRestEvenTemp; length(find(cifti_rest_even.data > 0))/length(vars_rest_even)];
 
-     if randomizevals == 1
-%         
-%         if permvals == 1
-%             
-            nsubs = nfiles;
+    vars_rest_size_even = zeros(length(vars_rest_even),1);
+    vars_rest_size_odd = zeros(length(vars_rest_odd),1);
+    vars_task_size_even = zeros(length(vars_task_even),1);
+    vars_task_size_odd = zeros(length(vars_task_odd),1);
+
+    for k = 1:length(vars_rest_even)
+        vars_rest_size_even(k) = length(find(cifti_rest_even.data == vars_rest_even(k)));
+    end
+
+    for k = 1:length(vars_rest_odd)
+        vars_rest_size_odd(k) = length(find(cifti_rest_odd.data == vars_rest_odd(k)));
+    end
+
+    for k = 1:length(vars_task_even)
+        vars_task_size_even(k) = length(find(cifti_task_even.data == vars_task_even(k)));
+    end
+
+    for k = 1:length(vars_task_odd)
+        vars_task_size_odd(k) = length(find(cifti_task_odd.data == vars_task_odd(k)));
+    end
+
+    MedianSizeVariantsTaskOddTemp = [MedianSizeVariantsTaskOddTemp; median(vars_task_size_odd)];
+    MedianSizeVariantsTaskEvenTemp = [MedianSizeVariantsTaskEvenTemp; median(vars_task_size_even)];
+    MedianSizeVariantsRestOddTemp = [MedianSizeVariantsRestOddTemp; median(vars_rest_size_odd)];
+    MedianSizeVariantsRestEvenTemp = [MedianSizeVariantsRestEvenTemp; median(vars_rest_size_even)];
+    %% end of descriptive stats part
+       
+    %% Dice correlations
+    dcorrdatataskrest1 = [];
+    dcorrdatataskrest2 = [];
+    dcorrdatarestrest = [];
+    dcorrdatatasktask = [];
+
+    for q = 1:length(cifti_rest_even.data)      %% Task-Rest Comparison 1
+        if cifti_rest_even.data(q) > 0 && cifti_task_odd.data(q) > 0
+            dcorrdatataskrest1 = [dcorrdatataskrest1;1 1];
+        elseif cifti_rest_even.data(q) > 0
+            dcorrdatataskrest1 = [dcorrdatataskrest1;1 0];
+        elseif cifti_task_odd.data(q) > 0
+            dcorrdatataskrest1 = [dcorrdatataskrest1;0 1];
+        end
+    end
+
+    for q = 1:length(cifti_rest_odd.data)      %% Task-Rest Comparison 2
+        if cifti_rest_odd.data(q) > 0 && cifti_task_even.data(q) > 0
+            dcorrdatataskrest2 = [dcorrdatataskrest2;1 1];
+        elseif cifti_rest_even.data(q) > 0
+            dcorrdatataskrest2 = [dcorrdatataskrest2;1 0];
+        elseif cifti_task_odd.data(q) > 0
+            dcorrdatataskrest2 = [dcorrdatataskrest2;0 1];
+        end
+    end
+
+    for q = 1:length(cifti_rest_odd.data)       %% Rest-Rest Comparison
+        if cifti_rest_odd.data(q) > 0 && cifti_rest_even.data(q) > 0
+            dcorrdatarestrest = [dcorrdatarestrest;1 1];
+        elseif cifti_rest_odd.data(q) > 0
+            dcorrdatarestrest = [dcorrdatarestrest;1 0];
+        elseif cifti_rest_even.data(q) > 0
+            dcorrdatarestrest = [dcorrdatarestrest;0 1];
+        end
+    end
+
+    for q = 1:length(cifti_task_odd.data)       %% Task-Task Comparison            
+        if cifti_task_odd.data(q) > 0 && cifti_task_even.data(q) > 0
+            dcorrdatatasktask = [dcorrdatatasktask;1 1];
+        elseif cifti_task_odd.data(q) > 0
+            dcorrdatatasktask = [dcorrdatatasktask;1 0];
+        elseif cifti_task_even.data(q) > 0
+            dcorrdatatasktask = [dcorrdatatasktask;0 1];
+        end
+    end
+
+    % if empty (due to low threshold or high size exclusion), then set dice corr to 0
+    if isempty(dcorrdatataskrest1)
+        dctaskrest1 = 0;
+    else                   
+        dctaskrest1 = dice_coefficient_mod(dcorrdatataskrest1(:,1),dcorrdatataskrest1(:,2));                    
+    end
+
+    if isempty(dcorrdatataskrest2)                    
+        dctaskrest2 = 0;
+    else
+        dctaskrest2 = dice_coefficient_mod(dcorrdatataskrest2(:,1),dcorrdatataskrest2(:,2));
+    end
+
+    if isempty(dcorrdatarestrest)
+        dcrestrest = 0;
+    else
+        dcrestrest = dice_coefficient_mod(dcorrdatarestrest(:,1),dcorrdatarestrest(:,2));
+    end
+
+    if isempty(dcorrdatatasktask)
+        dctasktask = 0;
+    else
+        dctasktask = dice_coefficient_mod(dcorrdatatasktask(:,1),dcorrdatatasktask(:,2));
+    end
+
+    DiceCorrsTaskRest = [DiceCorrsTaskRest; [dctaskrest1 dctaskrest2]];
+    DiceCorrsTaskTask = [DiceCorrsTaskTask; dctasktask];
+    DiceCorrsRestRest = [DiceCorrsRestRest; dcrestrest];
+end
+
+%% Saves SNR excluded data for each subject if you want to do permutations
+if randomizevals == 1 
+    if SplitHalf == 1
+        alltaskfilestaskeven = [alltaskfilestaskeven; cifti_task_even.data'];
+        alltaskfilestaskodd = [alltaskfilestaskodd; cifti_task_odd.data'];
+        alltaskfilesresteven = [alltaskfilesresteven; cifti_rest_even.data'];
+        alltaskfilesrestodd = [alltaskfilesrestodd; cifti_rest_odd.data'];
+    else
+        alltaskfilestask = [alltaskfilestask; cifti_task.data'];
+        alltaskfilesrest = [alltaskfilesrest; cifti_rest.data']; 
+    end
+end    
+%% Add temp variables to final variables, put these with descriptive stats
+
+NumVariantsTaskOdd = [NumVariantsTaskOdd NumVariantsTaskOddTemp];
+NumVariantsTaskEven = [NumVariantsTaskEven NumVariantsTaskEvenTemp];
+NumVariantsRestOdd = [NumVariantsRestOdd NumVariantsRestOddTemp];
+NumVariantsRestEven = [NumVariantsRestEven NumVariantsRestEvenTemp];
+MeanSizeVariantsTaskOdd = [MeanSizeVariantsTaskOdd MeanSizeVariantsTaskOddTemp];
+MeanSizeVariantsTaskEven = [MeanSizeVariantsTaskEven MeanSizeVariantsTaskEvenTemp];
+MeanSizeVariantsRestOdd = [MeanSizeVariantsRestOdd MeanSizeVariantsRestOddTemp];
+MeanSizeVariantsRestEven = [MeanSizeVariantsRestEven MeanSizeVariantsRestEvenTemp];
+MedianSizeVariantsTaskOdd = [MedianSizeVariantsTaskOdd MedianSizeVariantsTaskOddTemp];
+MedianSizeVariantsTaskEven = [MedianSizeVariantsTaskEven MedianSizeVariantsTaskEvenTemp];
+MedianSizeVariantsRestOdd = [MedianSizeVariantsRestOdd MedianSizeVariantsRestOddTemp];
+MedianSizeVariantsRestEven = [MedianSizeVariantsRestEven MedianSizeVariantsRestEvenTemp];
+    
+%% CHECK STARTING HERE!!!! COMPARE TO OLD SCRIPT
+if randomizevals == 1
             
-            DiceCorrssim = [];
-            DiceCorrSubs = zeros(2*(nsubs-1),nsubs);
+    nsubs = nfiles;
 
-            for l = 1:2     %% Do both versions of split-half combinations
-                
-                for m = 1:nsubs
-                    
-                    loopvals = [1:nsubs];
-                    loopvals(m) = [];
-                    
-                    Count = 0;
-                    
-                    for n = loopvals
-                        
-                        Count = Count+1;
+    DiceCorrssim = [];
+    DiceCorrSubs = zeros(2*(nsubs-1),nsubs);
 
-                        if l == 1
-                            
-                            restdat = alltaskfilesrestodd(m,:);
-                            taskdat = alltaskfilestaskeven(n,:);
-                            
-                        else
-                            
-                            restdat = alltaskfilesresteven(m,:);
-                            taskdat = alltaskfilestaskodd(n,:);
-                            
-                        end
-                            
-                    	dcorrdata = [];
-        
-                     	for q = 1:length(restdat)
-            
-                         	if restdat(:,q) > 0 && taskdat(:,q) > 0
-                
-                             	dcorrdata = [dcorrdata;1 1];
-                
-                            elseif restdat(:,q) > 0
-                
-                                dcorrdata = [dcorrdata;1 0];
-                
-                            elseif taskdat(:,q) > 0
-                
-                                dcorrdata = [dcorrdata;0 1];
-                
-                            end
-            
-                        end
-                    
-                        if isempty(dcorrdata)
-                        
-                            dc = 0;
-                        
-                        else
-        
-                            dc = dice_coefficient_mod(dcorrdata(:,1),dcorrdata(:,2));
-                        
-                        end
-        
-                        DiceCorrssim = [DiceCorrssim; dc];
-                        
-                        if l == 1
-                            
-                            DiceCorrSubs(Count,m) = dc;
-                            
-                        else
-                            
-                            DiceCorrSubs(Count+(nsubs-1),m) = dc;
-                            
-                        end
-                        
-                        
+    for l = 1:2     %% Do both versions of split-half combinations
+        for m = 1:nsubs
+
+            loopvals = [1:nsubs];
+            loopvals(m) = [];
+            Count = 0;
+
+            for n = loopvals
+                Count = Count+1;
+                if l == 1
+                    restdat = alltaskfilesrestodd(m,:);
+                    taskdat = alltaskfilestaskeven(n,:);
+                else
+                    restdat = alltaskfilesresteven(m,:);
+                    taskdat = alltaskfilestaskodd(n,:);
+                end
+
+                dcorrdata = [];
+
+                for q = 1:length(restdat)
+                    if restdat(:,q) > 0 && taskdat(:,q) > 0
+                        dcorrdata = [dcorrdata;1 1];
+                    elseif restdat(:,q) > 0
+                        dcorrdata = [dcorrdata;1 0];
+                    elseif taskdat(:,q) > 0
+                        dcorrdata = [dcorrdata;0 1];
                     end
                 end
+
+                if isempty(dcorrdata)
+                    dc = 0;
+                else
+                    dc = dice_coefficient_mod(dcorrdata(:,1),dcorrdata(:,2));
+                end
+
+                DiceCorrssim = [DiceCorrssim; dc];
+
+                if l == 1
+                    DiceCorrSubs(Count,m) = dc;
+                else
+                    DiceCorrSubs(Count+(nsubs-1),m) = dc;
+                end
             end
-            
-            DiceCorrspval = prctile(DiceCorrssim, 95);
-            
-%         else
-%     
-%             nsim = 1000;
-%             nsubs = nfiles;
-%     
-%             DiceCorrssim = zeros(1,nsim);
-%         
-%             if AnyOverlap == 1
-%         
-%                 NumOverlapsim = zeros(1,nsim);
-%                 
-%             end
-%         
-%             if COMOverlap == 1
-%             
-%                 COMOverlapssim = zeros(1,nsim);
-%             
-%             end
-%     
-%             DiceCorrssimAll = zeros(nsubs,nsim);
-%     
-%             tasktaskshuffleall = [];
-%             taskrestshuffleall = [];
-%     
-%     
-%             for x = 1:nsim
-%         
-% 
-%                 alltaskdc = [];
-%         
-%                 while true      %% Make sure no subjects match each other
-%             
-%                     reshuffle = 0;
-%     
-%                     rng('shuffle');  %% Reset random number generator on each iteration
-%         
-%                     % Randomly shuffle rows (subjects) for each task and rest matrix
-%         
-%                     tasktaskshuffle = 1:nsubs;
-%                     taskrestshuffle = 1:nsubs;
-%         
-%                     tasktaskshuffle = tasktaskshuffle(randperm(length(1:nsubs)));
-%                     taskrestshuffle = taskrestshuffle(randperm(length(1:nsubs)));
-%             
-%                     for h = 1:length(tasktaskshuffle)
-%                 
-%                         if reshuffle == 0 && tasktaskshuffle(h) == taskrestshuffle(h)
-%                     
-%                             reshuffle = 1;
-%                     
-%                         end
-%                     end
-%             
-%                     if reshuffle == 0  %% Break loop if all subjects are shuffled
-%                 
-%                         tasktaskshuffleall = [tasktaskshuffleall tasktaskshuffle'];
-%                         taskrestshuffleall = [taskrestshuffleall taskrestshuffle'];
-%                 
-%                         break
-%                 
-%                     end
-%                 end
-%         
-%                 if SplitHalf == 1
-%             
-%                     alltasktaskshuffle = alltaskfilestaskodd(tasktaskshuffle,:);
-%                     alltaskrestshuffle = alltaskfilesresteven(taskrestshuffle,:);
-%                     %alltasktaskshuffle = alltaskfilesresteven(randperm(size(alltaskfilestaskodd,1)),:);
-%                     %alltaskrestshuffle = alltaskfilestaskodd(randperm(size(alltaskfilesresteven,1)),:);
-%             
-%                 else
-%         
-%                     alltasktaskshuffle = alltaskfilestask(tasktaskshuffle,:);
-%                     alltaskrestshuffle = alltaskfilesrest(taskrestshuffle,:);
-%                     %alltasktaskshuffle = alltaskfilestask(randperm(size(alltaskfilestask,1)),:);
-%                     %alltaskrestshuffle = alltaskfilesrest(randperm(size(alltaskfilesrest,1)),:);
-%             
-%                 end
-%         
-%                 DiceCorrssimtemp = zeros(1,size(alltasktaskshuffle,1));
-%                 NumOverlapsimtemp = zeros(1,size(alltasktaskshuffle,1));
-%                 COMOverlapssimtemp = zeros(1,size(alltasktaskshuffle,1));
-%     
-%         
-%                 for d = 1:size(alltasktaskshuffle,1)
-%             
-%                     vars_rest = unique(alltaskrestshuffle(d,:));
-%                     vars_rest(1) = [];
-%                     vars_task = unique(alltasktaskshuffle(d,:));
-%                     vars_task(1) = [];
-%     
-%                     if DiceCorr == 1
-%         
-%                         dcorrdata = [];
-%         
-%                         for q = 1:length(alltaskrestshuffle(d,:))
-%             
-%                             if alltaskrestshuffle(d,q) > 0 && alltasktaskshuffle(d,q) > 0
-%                 
-%                                 dcorrdata = [dcorrdata;1 1];
-%                 
-%                             elseif alltaskrestshuffle(d,q) > 0
-%                 
-%                                 dcorrdata = [dcorrdata;1 0];
-%                 
-%                             elseif alltasktaskshuffle(d,q) > 0
-%                 
-%                                 dcorrdata = [dcorrdata;0 1];
-%                 
-%                             end
-%             
-%                         end
-%                     
-%                         if isempty(dcorrdata)
-%                         
-%                             dc = 0;
-%                         
-%                         else
-%         
-%                             dc = dice_coefficient_mod(dcorrdata(:,1),dcorrdata(:,2));
-%                         
-%                         end
-%         
-%                         DiceCorrssimtemp(d) = dc;
-%     
-%                     end
-% 
-%                     if AnyOverlap == 1
-%    
-%                         overlapvars = [];
-%         
-%                         for r = 1:length(vars_rest)
-%             
-%                             for s = 1:length(alltaskrestshuffle(d,:))
-%             
-%                                 if alltaskrestshuffle(d,s) == vars_rest(r) && alltasktaskshuffle(d,s) > 0
-%                 
-%                                     overlapvars = [overlapvars;vars_rest(r) alltasktaskshuffle(d,s)];
-%                 
-%                                 end
-%                 
-%                             end
-%             
-%                         end
-%                     
-%                         if isempty(overlapvars)
-%                         
-%                             NumOverlapsimtemp(d) = 0;
-%                         
-%                         else
-%         
-%                             NumOverlapsimtemp(d) = (length(unique(overlapvars(:,1))) + length(unique(overlapvars(:,2))))/(length(vars_rest) + length(vars_task));
-%                         
-%                         end
-%     
-%                     end
-% 
-%                     if COMOverlap == 1
-%     
-%                         %meanvals = [];
-%                         COMOverlapsresttemp = [];
-%                         COMOverlapstasktemp = [];
-%         
-%         
-%                         taskverts = find(alltasktaskshuffle(d,:) > 0);
-%                         restverts = find(alltaskrestshuffle(d,:) > 0);
-%         
-%                         for a = 1:2   %% loop over task and rest
-%             
-%                             if a == 1
-%                 
-%                                 nvars = length(vars_rest);
-%                 
-%                             else
-%                 
-%                                 nvars = length(vars_task);
-%                 
-%                             end
-%         
-%                             for s = 1:nvars
-%                 
-%                                 if a == 1
-%             
-%                                     currentvariant = find(alltaskrestshuffle(d,:) == vars_rest(s));
-%                 
-%                                 else
-%                     
-%                                     currentvariant = find(alltasktaskshuffle(d,:) == vars_task(s));
-%                     
-%                                 end
-%                 
-%                                 COMtemp = cifti_coords.data(currentvariant,:);
-%                 
-%                                 if length(currentvariant) > 1
-%                     
-%                                     centroid = [];
-%                     
-%                                     for t = 1:length(currentvariant)
-%                         
-%                                         jacknifevals = 1:length(currentvariant);        %% Leaves current point out of calculation
-%                                         jacknifevals(t) = [];
-%                     
-%                                         % Euclidean distance
-%                                         dist = mean(sqrt(sum((COMtemp(jacknifevals,:) - COMtemp(t,:)).^2, 2)));
-%                         
-%                                         %meanvals = [meanvals; dist];
-%                         
-%                                         if isempty(centroid) || dist < centroid   %% If new distance less than current least distance, use as center
-%                             
-%                                             centroid = currentvariant(t);
-%                             
-%                                         end
-%                         
-%                                     end
-%                     
-%                                     centervariant = centroid;
-%                     
-%                                 else
-%                     
-%                                     centervariant = currentvariant;
-%                     
-%                                 end
-%                 
-%                                 if a == 1
-%                 
-%                                     COMOverlapsresttemp = [COMOverlapsresttemp; centervariant];
-%                     
-%                                 else
-%                     
-%                                     COMOverlapstasktemp = [COMOverlapstasktemp; centervariant];
-%                     
-%                                 end 
-%                             end
-%                         end
-%         
-%                         Taskoverlaps = length(unique(intersect(COMOverlapstasktemp, restverts)));
-%                         Restoverlaps = length(unique(intersect(COMOverlapsresttemp, taskverts)));
-%         
-%                         COMOverlapssimtemp(d) = (Taskoverlaps + Restoverlaps)/(length(vars_rest) + length(vars_task));
-%             
-%             
-%                     end
-%                 end
-%     
-%                 DiceCorrssim(x) = mean(DiceCorrssimtemp);
-%             
-%                 if AnyOverlap == 1
-%                 
-%                     NumOverlapsim(x) = mean(NumOverlapsimtemp);
-%             
-%                 end
-%             
-%                 if COMOverlap == 1
-%             
-%                     COMOverlapssim(x) = mean(COMOverlapssimtemp);
-%                 
-%                 end
-%         
-%                 DiceCorrssimAll(:,x) = DiceCorrssimtemp';
-%         
-%         
-%                 if mod(x,100) == 0
-%             
-%                     disp([num2str(x) ' iterations completed'])
-%             
-%                 end
-%     
-%             end
-%     
-%             DiceCorrspval = prctile(DiceCorrssim, 95);
-%         
-%             if AnyOverlap == 1
-%             
-%                 NumOverlappval = prctile(NumOverlapsim, 95);
-%         
-%             end
-%         
-%             if COMOverlap == 1
-%             
-%                 COMOverlapspval = prctile(COMOverlapssim, 95);
-%         
-%             end
-%     
-%             DiceCorrssub = zeros(nsubs,1);      %% Calculate averaged values per subject for (pseudo) effect size
-%     
-%             for m = 1:size(DiceCorrssimAll,2)
-%         
-%                 for n = 1:size(DiceCorrssimAll,1)
-%             
-%                     for o = 1:nsubs
-%             
-%                         if tasktaskshuffleall(n,m) == o || taskrestshuffleall(n,m) == o
-%                 
-%                             DiceCorrssub(o) = DiceCorrssub(o) + DiceCorrssimAll(n,m);
-%                 
-%                         end
-%                     end
-%                 end
-%             end
-%     
-%             DiceCorrssub = DiceCorrssub./(size(DiceCorrssimAll,2)*2);
-%         
-% 
-%         end
-%     end
+        end
+    end
 
+    DiceCorrspval = prctile(DiceCorrssim, 95);
 
-%     if SubjectPlots == 1
-%     
-%         SubjectDiceCorrs = [];
-%         
-%         if AnyOverlap == 1
-%         
-%             SubjectNumOverlap = [];
-%             
-%         end
-%         
-%         if COMOverlap == 1
-%             
-%             SubjectCOMOverlap = [];
-%             
-%         end
-%     
-%         for j = 1:nfiles
-%         
-%             if SplitHalf == 1
-%             
-%                 alltasktasksubject = alltaskfilestaskodd(j,:);
-%                 alltaskrestsubject = alltaskfilesresteven(j,:);
-%             
-%                 alltasktaskcomp = alltaskfilestaskodd;
-%                 alltasktaskcomp(j,:) = [];
-%                 alltaskrestcomp = alltaskfilesresteven;
-%                 alltaskrestcomp(j,:) = [];
-%             
-%             else
-%         
-%                 alltasktasksubject = alltaskfilestask(j,:);
-%                 alltaskrestsubject = alltaskfilesrest(j,:);
-%             
-%                 alltasktaskcomp = alltaskfilestask;
-%                 alltasktaskcomp(j,:) = [];
-%                 alltaskrestcomp = alltaskfilesrest;
-%                 alltaskrestcomp(j,:) = [];
-%             
-%             end
-%         
-%             vars_rest = unique(alltaskrestsubject);
-%             vars_rest(1) = [];
-%             vars_task = unique(alltasktasksubject);
-%             vars_task(1) = [];
-% 
-%             for d = 1:size(alltasktaskcomp,1)
-%             
-%                 vars_rest_comp = unique(alltaskrestcomp(d,:));
-%                 vars_rest_comp(1) = [];
-%                 vars_task_comp = unique(alltasktaskcomp(d,:));
-%                 vars_task_comp(1) = [];
-%             
-%                 SubjectDiceCorrstemp = [];
-%                 SubjectNumOverlaptemp = [];
-%                 SubjectCOMOverlaptemp = [];
-%             
-%                 if DiceCorr == 1
-%         
-%                     dcorrdatataskcomp = [];
-%                     dcorrdatarestcomp = [];
-%         
-%                     for q = 1:length(alltasktasksubject)
-%             
-%                         if alltaskrestsubject(:,q) > 0 && alltasktaskcomp(d,q) > 0
-%                 
-%                             dcorrdatataskcomp = [dcorrdatataskcomp;1 1];
-%                 
-%                         elseif alltaskrestsubject(:,q) > 0
-%                 
-%                             dcorrdatataskcomp = [dcorrdatataskcomp;1 0];
-%                 
-%                         elseif alltasktaskcomp(d,q) > 0
-%                 
-%                             dcorrdatataskcomp = [dcorrdatataskcomp;0 1];
-%                 
-%                         end
-%             
-%                     end
-%                 
-%                     for r = 1:length(alltaskrestsubject)
-%             
-%                         if alltasktasksubject(:,r) > 0 && alltaskrestcomp(d,r) > 0
-%                 
-%                             dcorrdatarestcomp = [dcorrdatarestcomp;1 1];
-%                 
-%                         elseif alltasktasksubject(:,r) > 0
-%                 
-%                             dcorrdatarestcomp = [dcorrdatarestcomp;1 0];
-%                 
-%                         elseif alltaskrestcomp(d,r) > 0
-%                 
-%                             dcorrdatarestcomp = [dcorrdatarestcomp;0 1];
-%                 
-%                         end
-%             
-%                     end
-%                     
-%                     if isempty(dcorrdatataskcomp) && isempty(dcorrdatarestcomp)
-%                         
-%                         dctaskcomp = 0;
-%                         dcrestcomp = 0;
-%                         
-%                     elseif isempty(dcorrdatataskcomp)
-%                         
-%                         dctaskcomp = 0;
-%                         dcrestcomp = dice_coefficient_mod(dcorrdatarestcomp(:,1),dcorrdatarestcomp(:,2));
-%                         
-%                     elseif isempty(dcorrdatarestcomp)
-%                         
-%                         dcrestcomp = 0;
-%                         dctaskcomp = dice_coefficient_mod(dcorrdatataskcomp(:,1),dcorrdatataskcomp(:,2));
-%                         
-%                     else
-%                         
-%                         dctaskcomp = dice_coefficient_mod(dcorrdatataskcomp(:,1),dcorrdatataskcomp(:,2));
-%                         dcrestcomp = dice_coefficient_mod(dcorrdatarestcomp(:,1),dcorrdatarestcomp(:,2));
-%                         
-%                     end
-%         
-%                     SubjectDiceCorrstemp = [SubjectDiceCorrstemp dctaskcomp dcrestcomp];
-%     
-%                 end
-%             
-%             
-%                 if AnyOverlap == 1
-%    
-%                     overlapvarstaskcomp = [];
-%                     overlapvarsrestcomp = [];
-%         
-%                     for r = 1:length(vars_rest)
-%             
-%                         for s = 1:length(alltaskrestsubject)
-%             
-%                             if alltaskrestsubject(:,s) == vars_rest(r) && alltasktaskcomp(d,s) > 0
-%                 
-%                                 overlapvarstaskcomp = [overlapvarstaskcomp;vars_rest(r) alltasktaskcomp(d,s)];
-%                 
-%                             end
-%                 
-%                         end
-%             
-%                     end
-%                 
-%                     for p = 1:length(vars_task)
-%             
-%                         for q = 1:length(alltasktasksubject)
-%             
-%                             if alltasktasksubject(:,q) == vars_task(p) && alltaskrestcomp(d,q) > 0
-%                 
-%                                 overlapvarsrestcomp = [overlapvarsrestcomp;vars_task(p) alltaskrestcomp(d,q)];
-%                 
-%                             end
-%                 
-%                         end
-%             
-%                     end
-%                     
-%                     if isempty(overlapvarsrestcomp) && isempty(overlapvarstaskcomp)
-%                         
-%                         SubjectNumOverlaptemp = [SubjectNumOverlaptemp 0 0];
-%                         
-%                     elseif isempty(overlapvarsrestcomp)
-%                         
-%                         SubjectNumOverlaptemp = [SubjectNumOverlaptemp (length(unique(overlapvarstaskcomp(:,1))) + length(unique(overlapvarstaskcomp(:,2))))/(length(vars_rest) + length(vars_task_comp)) 0];
-%                         
-%                     elseif isempty(overlapvarstaskcomp)
-%                         
-%                         SubjectNumOverlaptemp = [SubjectNumOverlaptemp 0 (length(unique(overlapvarsrestcomp(:,1))) + length(unique(overlapvarsrestcomp(:,2))))/(length(vars_task) + length(vars_rest_comp))];
-%                         
-%                     else
-%         
-%                         SubjectNumOverlaptemp = [SubjectNumOverlaptemp (length(unique(overlapvarstaskcomp(:,1))) + length(unique(overlapvarstaskcomp(:,2))))/(length(vars_rest) + length(vars_task_comp)) (length(unique(overlapvarsrestcomp(:,1))) + length(unique(overlapvarsrestcomp(:,2))))/(length(vars_task) + length(vars_rest_comp))];
-%                         
-%                     end
-%     
-%                 end
-%             
-%                 if COMOverlap == 1
-%                 
-%                     for z = 1:2     %% Loops over subject task - all rest and subject rest - all task comparisons
-%                     
-%                         %meanvals = [];
-%                         COMOverlapsresttemp = [];
-%                         COMOverlapstasktemp = [];
-%         
-%                         if z == 1     %% subject task - all rest comparison
-%                         
-%                             taskverts = find(alltasktasksubject > 0);
-%                             restverts = find(alltaskrestcomp(d,:) > 0);
-%                         
-%                         elseif z == 2	  %% subject rest - all task comparison
-%                         
-%                             taskverts = find(alltasktaskcomp(d,:) > 0);
-%                             restverts = find(alltaskrestsubject > 0);
-%                         
-%                         end
-%         
-%                         for a = 1:2   %% loop over task and rest
-%             
-%                             if a == 1    %% Rest loop
-%                             
-%                                 if z == 1     %% subject task - all rest comparison
-%                 
-%                                     nvars = length(vars_rest_comp);
-%                                 
-%                                 elseif z == 2	  %% subject rest - all task comparison
-%                                 
-%                                     nvars = length(vars_rest);
-%                                 
-%                                 end
-%                 
-%                             elseif a == 2   %% Task loop
-%                             
-%                                 if z == 1     %% subject task - all rest comparison
-%                 
-%                                     nvars = length(vars_task);
-%                                 
-%                                 elseif z == 2	  %% subject rest - all task comparison
-%                                                                 
-%                                     nvars = length(vars_task_comp);
-%                                 
-%                                 end
-%                 
-%                             end
-%         
-%                             for s = 1:nvars
-%                 
-%                                 if a == 1   %% Rest loop
-%                                 
-%                                     if z == 1     %% subject task - all rest comparison
-%             
-%                                         currentvariant = find(alltaskrestcomp(d,:) == vars_rest_comp(s));
-%                                     
-%                                     elseif z == 2	  %% subject rest - all task comparison
-%                                     
-%                                         currentvariant = find(alltaskrestsubject == vars_rest(s));
-%                                     
-%                                     end
-%                 
-%                                 elseif a == 2   %% Task loop
-%                                 
-%                                     if z == 1     %% subject task - all rest comparison
-%                     
-%                                         currentvariant = find(alltasktasksubject == vars_task(s));
-%                                     
-%                                     elseif z == 2	  %% subject rest - all task comparison
-%                                     
-%                                         currentvariant = find(alltasktaskcomp(d,:) == vars_task_comp(s));
-%                                     
-%                                     end
-%                     
-%                                 end
-%                 
-%                                 COMtemp = cifti_coords.data(currentvariant,:);
-%                 
-%                                 if length(currentvariant) > 1
-%                     
-%                                     centroid = [];
-%                     
-%                                     for t = 1:length(currentvariant)
-%                         
-%                                         jacknifevals = 1:length(currentvariant);        %% Leaves current point out of calculation
-%                                         jacknifevals(t) = [];
-%                     
-%                                         % Euclidean distance
-%                                         dist = mean(sqrt(sum((COMtemp(jacknifevals,:) - COMtemp(t,:)).^2, 2)));
-%                         
-%                                         %meanvals = [meanvals; dist];
-%                         
-%                                         if isempty(centroid) || dist < centroid   %% If new distance less than current least distance, use as center
-%                             
-%                                             centroid = currentvariant(t);
-%                             
-%                                         end
-%                         
-%                                     end
-%                     
-%                                     centervariant = centroid;
-%                     
-%                                 else
-%                     
-%                                     centervariant = currentvariant;
-%                     
-%                                 end
-%                 
-%                                 if a == 1
-%                 
-%                                     COMOverlapsresttemp = [COMOverlapsresttemp; centervariant];
-%                     
-%                                 else
-%                     
-%                                     COMOverlapstasktemp = [COMOverlapstasktemp; centervariant];
-%                     
-%                                 end 
-%                             end
-%                         end
-%         
-%                         Taskoverlaps = length(unique(intersect(COMOverlapstasktemp, restverts)));
-%                         Restoverlaps = length(unique(intersect(COMOverlapsresttemp, taskverts)));
-%                     
-%                         if z == 1     %% subject task - all rest comparison
-%                         
-%                             restdivisor = length(vars_rest_comp);
-%                             taskdivisor = length(vars_task);
-%                         
-%                         elseif z == 2	  %% subject rest - all task comparison
-%                         
-%                             restdivisor = length(vars_rest);
-%                             taskdivisor = length(vars_task_comp);
-%                         
-%                         end   
-%         
-%                         SubjectCOMOverlaptemp = [SubjectCOMOverlaptemp (Taskoverlaps + Restoverlaps)/(restdivisor + taskdivisor)];
-%             
-%                     end
-%             
-%                 end
-%             
-%             end
-%         
-%             SubjectDiceCorrs = [SubjectDiceCorrs; SubjectDiceCorrstemp];
-%             
-%             if AnyOverlap == 1
-%             
-%                 SubjectNumOverlap = [SubjectNumOverlap; SubjectNumOverlaptemp];
-%                 
-%             end
-%             
-%             if COMOverlap == 1
-%                 
-%                 SubjectCOMOverlap = [SubjectCOMOverlap; SubjectCOMOverlaptemp];
-%                 
-%             end
-%             
-%         end
-%         
-%     end
+%% AND ENDING HERE
 
+%% Plotting Results
 
-%% plot results
-%haven't started working on this part
-    if plotresults == 1
+if plotresults == 1
     
        % if SubjectPlots == 1
         
 
 %        		if SplitHalf == 1
 %                 
-%                 if AnyOverlap == 1 && COMOverlap == 1
-%         
-%                     plotdatawithinstate = [mean([DiceCorrsRestRest DiceCorrsTaskTask],2) mean([NumOverlapRestRest NumOverlapTaskTask],2) mean([COMOverlapsRestRest COMOverlapsTaskTask],2)];       
-%                     plotdatabetweenstate = [DiceCorrsTaskRest NumOverlapTaskRest COMOverlapsTaskRest];
-%                     plotdatanull = [mean(SubjectDiceCorrs,2) mean(SubjectNumOverlap,2) mean(SubjectCOMOverlap,2)];
-%                     
-%                 elseif AnyOverlap == 1
-%                     
-%                     plotdatawithinstate = [mean([DiceCorrsRestRest DiceCorrsTaskTask],2) mean([NumOverlapRestRest NumOverlapTaskTask],2)];       
-%                     plotdatabetweenstate = [DiceCorrsTaskRest NumOverlapTaskRest];
-%                     plotdatanull = [mean(SubjectDiceCorrs,2) mean(SubjectNumOverlap,2)];
-%                     
-%                 elseif COMOverlap == 1
-%                     
-%                     plotdatawithinstate = [mean([DiceCorrsRestRest DiceCorrsTaskTask],2) mean([COMOverlapsRestRest COMOverlapsTaskTask],2)];       
-%                     plotdatabetweenstate = [DiceCorrsTaskRest COMOverlapsTaskRest];
-%                     plotdatanull = [mean(SubjectDiceCorrs,2) mean(SubjectCOMOverlap,2)];
-%                     
-%                 else
-%                     
-%                    	plotdatawithinstate = [mean([DiceCorrsRestRest DiceCorrsTaskTask],2)];       
-%                     plotdatabetweenstate = DiceCorrsTaskRest;
-%                     plotdatanull = mean(SubjectDiceCorrs,2);
-%                     
-%                 end
-%             
+
 %             else
                 
 %                 if AnyOverlap == 1 && COMOverlap == 1
-%             
-%                     plotdatabetweenstate = [DiceCorrs NumOverlap COMOverlaps];
-%                     plotdatanull = [mean(SubjectDiceCorrs,2) mean(SubjectNumOverlap,2) mean(SubjectCOMOverlap,2)];
-%                     
+
 %                 elseif AnyOverlap == 1
-%                     
-%                     plotdatabetweenstate = [DiceCorrs NumOverlap];
-%                     plotdatanull = [mean(SubjectDiceCorrs,2) mean(SubjectNumOverlap,2)];
-%                     
+
 %                 elseif COMOverlap == 1
-%                     
-%                     plotdatabetweenstate = [DiceCorrs COMOverlaps];
-%                     plotdatanull = [mean(SubjectDiceCorrs,2) mean(SubjectCOMOverlap,2)];
-%                     
+
 %                 else
                     
                     plotdatabetweenstate = DiceCorrs;
