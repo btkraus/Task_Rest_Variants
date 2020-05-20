@@ -1,6 +1,7 @@
-% This script makes Dconns (if the MakeDconn variable = 1) and variant files
+% This script makes Dconns (and saves them if the MakeDconn variable = 1) and variant files
 % (if VariantMap = 1)for task data of each subject's even and odd sessions. 
 % QC files need to be named [subject]_QCFile.mat, ex. 'MSC01_QCFile.mat'
+% Dependecies: MSC Data, 
 % Written by Brian Kraus, edited by Diana Perez.
 
 parpool('local', 28)     %% Name of cluster profile for batch job (how many workers/cores you need to run this job)
