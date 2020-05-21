@@ -20,8 +20,6 @@ output_path = '/home/btk2142/output_files/variant_maps'; %%%%%% WHAT IS THE DIFF
 template_path = '/projects/b1081/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii'; %location of correlation map (???) to be used as template
 cd '/projects/b1081';   %% Change CD to root project directory
 %% Options
-%take out restonly and subsample -- this version does not include an option
-%of rest only data, and uses subsample of tmask by default
 SplitHalf = 1;  %% Toggles whether to calculate rest for split-half of sessions
 RandSample = 1; %% Toggles random subsampling of tmask on/off
 MatchData = 1; %% Toggles whether to match the amount of data per task as the lowest value within each split-half
@@ -43,86 +41,11 @@ if ConcatenateTasksMatch == 1
     taskbackup = tasks;
 end
 
-% sets up variables for sum of sample points in each task of even- and odd-numbered
-% sessions to be used later
-memptsoddsum = [];
-motorptsoddsum = [];
-mixedptsoddsum = [];
-memptsevensum = [];
-motorptsevensum = [];
-mixedptsevensum = [];
-
 %% Start Analysis 
 disp(sprintf('Job Started: %s', datestr(now)));
 %% Matches data points for all tasks across subjects
-if MatchData == 1 && MatchAcrossSubs == 1
-%this for-loop determines the number of sample points to match
-    for n=1:numel(subs)
-    
-        load ([QC_path subs{n} '_QCFile.mat']); 
-        
-        % setting up variables
-        memptsodd = [];
-        motorptsodd = [];
-        mixedptsodd = [];
-        memptseven = [];
-        motorptseven = [];
-        mixedptseven = [];
-        
-        % QC files contain SubStruct with # of sample points for each task
-        % and whether the session is an even- or odd-numbered session
-        for u = 1:length(SubStruct)            
-            if SubStruct(u).OddEven == 1 % odd = 1, even = 2
-                % gets number of sample points from QC files for
-                % odd-numbered sessions
-                memptsodd = [memptsodd; SubStruct(u).MemSampPts];
-                mixedptsodd = [mixedptsodd; SubStruct(u).MixedSampPts];
-            
-                %  MSC09 not enough motor sample points
-                if ~strcmp(subs{n}, 'MSC09')
-                    motorptsodd = [motorptsodd; SubStruct(u).MotorSampPts];                
-                end               
-            elseif SubStruct(u).OddEven == 2
-                % gets number of sample points from QC files for
-                % even-numbered sessions
-                memptseven = [memptseven; SubStruct(u).MemSampPts];
-                mixedptseven = [mixedptseven; SubStruct(u).MixedSampPts];
-            
-                % MSC09 not enough motor sample points
-                if ~strcmp(subs{n}, 'MSC09')            
-                    motorptseven = [motorptseven; SubStruct(u).MotorSampPts];                
-                end      
-            end
-        end
-    
-        %sum sample points for each task
-        memptsoddsum = [memptsoddsum; sum(memptsodd)];
-        mixedptsoddsum = [mixedptsoddsum; sum(mixedptsodd)];
-        memptsevensum = [memptsevensum; sum(memptseven)];
-        mixedptsevensum = [mixedptsevensum; sum(mixedptseven)];
-        
-        if strcmp(subs{n}, 'MSC09')        
-            motorptsoddsum = [motorptsoddsum; 9999]; 
-            motorptsevensum = [motorptsevensum; 9999];
-        else            
-            motorptsoddsum = [motorptsoddsum; sum(motorptsodd)];
-            motorptsevensum = [motorptsevensum; sum(motorptseven)];
-        end        
-    end
-    
-    %gets minimum number of sample points across tasks/subjects
-    if SplitHalf == 1   
-        mintasksamps = min(min([memptsoddsum motorptsoddsum mixedptsoddsum memptsevensum motorptsevensum mixedptsevensum]));        
-    elseif ConcatenateTaskData == 1        
-        mintasksamps = min(min([(memptsoddsum + memptsevensum)  (motorptsoddsum + motorptsevensum)  (mixedptsoddsum + mixedptsevensum)]));        
-    end
-     
-    %why is this commented out? Not using it? Can I delete?
-    if ConcatenateTaskData == 1         
-         %mintasksamps = mintasksamps * numel(tasks);         
-    end    
-end
 
+[mintasksamps] = mintasksamps(QC_path, subs, SplitHalf, ConcatenateTaskData, MatchData, MatchAcrossSubs);
 
 for i=1:numel(subs)
     
