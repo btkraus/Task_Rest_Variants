@@ -33,6 +33,7 @@ SaveTimeseries = 0;     %% Save concatenated timeseries for subject
 subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC09','MSC10'};
 tasks = {'motor','mem','mixed'};
 voxnum = 59412; % number of voxels for template
+<<<<<<< Updated upstream
 
 % sets up variables for sum of sample points in each task of even- and odd-numbered
 % sessions to be used later
@@ -42,10 +43,13 @@ voxnum = 59412; % number of voxels for template
 % memptsevensum = [];
 % motorptsevensum = [];
 % mixedptsevensum = [];
+=======
+>>>>>>> Stashed changes
 %% Start analysis
 disp(sprintf('Job Started: %s', datestr(now)));
 %% Matches data points for all tasks across subjects
 [mintasksamps] = mintasksamps(QCFiles_path, subs, SplitHalf, ConcatenateTasks, MatchData, MatchAcrossSubs)
+<<<<<<< Updated upstream
 % if MatchData == 1 && MatchAcrossSubs == 1
 % % This for-loop determines the number of sample points to match
 %     for n=1:numel(subs)
@@ -110,6 +114,8 @@ disp(sprintf('Job Started: %s', datestr(now)));
 %     end    
 % end
 
+=======
+>>>>>>> Stashed changes
 %% Main for-loop: makes Dconns
 for i=1:numel(subs)
     
