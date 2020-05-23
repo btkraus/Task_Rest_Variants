@@ -1,12 +1,17 @@
+<<<<<<< HEAD
 % This script makes Dconns (if the MakeDconn variable = 1) and variant files
 % (if VariantMap = 1)for task data of each subject's even and odd sessions. 
 % QC files need to be na med [subject]_QCFile.mat, ex. 'MSC01_QCFile.mat'
 % Written by Brian Kraus, edited by Diana Perez.
 
 %parpool('local', 28)     %% Name of cluster profile for batch job (how many workers/cores you need to run this job)
+=======
+parpool('local', 20)     %% Name of cluster profile for batch job
+>>>>>>> b13c67354ef986896c2fa8915a45372471bf4945
 
 clear all
 
+<<<<<<< HEAD
 disp(sprintf('Job Submitted: %s', datestr(now)));
 
 %% Paths
@@ -21,8 +26,19 @@ addpath(genpath('/projects/b1081/member_directories/bkraus/Brian_MSC/'));
 addpath(genpath('/projects/b1081/member_directories/dperez/Analysis_Scripts_Replication/'));
 %% Options
 SplitHalf = 1;  %% Toggles whether to create a separate file for odd/even sessions
+=======
+outdir = '/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_task_files';
+dataLocStem = '/MSC/TaskFC/';
+%subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC10'};
+subs = {'MSC01','MSC02','MSC03','MSC04','MSC05','MSC06','MSC07','MSC09','MSC10'};
+tasks = {'motor','mem','mixed'};
+%tasks = {'mem'};
+
+CortexOnly = 1; %% Toggles whether to run correlations on cortex only
+SplitHalf = 0;  %% Toggles whether to create a separate file for odd/even sessions
+>>>>>>> b13c67354ef986896c2fa8915a45372471bf4945
 MatchData = 1; %% Toggles whether to match the amount of data per task as the lowest value within each split-half
-RandSample = 1; %% Toggles whether to randomly sample data from each session
+RandSample = 0; %% Toggles whether to randomly sample data from each session
 MatchAcrossSubs = 1;  %% Toggles whether to match the amount of data across subjects
 MatchAcrossTasks = 0;  %% Toggles whether to match the amount of data across tasks
 ConcatenateTasks = 1;   %% Toggles whether to concatenate data for all tasks
@@ -35,9 +51,124 @@ tasks = {'motor','mem','mixed'};
 voxnum = 59412; % number of voxels for template
 %% Start analysis
 disp(sprintf('Job Started: %s', datestr(now)));
+<<<<<<< HEAD
 %% Matches data points for all tasks across subjects
 [mintasksamps] = mintasksamps(QCFiles_path, subs, SplitHalf, ConcatenateTasks, MatchData, MatchAcrossSubs)
 %% Main for-loop: makes Dconns
+=======
+
+if CortexOnly == 1      %% Select correct number of voxels for template
+    
+    voxnum = 59412;
+    
+else
+    
+    voxnum = 65625;
+    
+end
+
+if MatchData == 1 && MatchAcrossSubs == 1
+
+   	memptsoddsum = [];
+   	motorptsoddsum = [];
+   	mixedptsoddsum = [];
+   	memptsevensum = [];
+   	motorptsevensum = [];
+   	mixedptsevensum = [];
+
+    for n=1:numel(subs)
+    
+        load (['/projects/b1081/member_directories/bkraus/Brian_MSC/QC_files/' subs{n} '_QCFile.mat']);
+        
+        memptsodd = [];
+        motorptsodd = [];
+        mixedptsodd = [];
+        memptseven = [];
+        motorptseven = [];
+        mixedptseven = [];
+        
+        for u = 1:length(SubStruct)
+            
+            if SubStruct(u).OddEven == 1
+                
+                memptsodd = [memptsodd; SubStruct(u).MemSampPts];
+                mixedptsodd = [mixedptsodd; SubStruct(u).MixedSampPts];
+            
+                if ~strcmp(subs{n}, 'MSC09')
+            
+                    motorptsodd = [motorptsodd; SubStruct(u).MotorSampPts];
+                
+                end
+                
+            elseif SubStruct(u).OddEven == 2
+                
+                memptseven = [memptseven; SubStruct(u).MemSampPts];
+                mixedptseven = [mixedptseven; SubStruct(u).MixedSampPts];
+            
+                if ~strcmp(subs{n}, 'MSC09')
+            
+                    motorptseven = [motorptseven; SubStruct(u).MotorSampPts];
+                
+                end
+      
+            end
+        end
+    
+        memptsoddsum = [memptsoddsum; sum(memptsodd)];
+        
+        if strcmp(subs{n}, 'MSC09')
+        
+            motorptsoddsum = [motorptsoddsum; 9999];
+            
+        else
+            
+            motorptsoddsum = [motorptsoddsum; sum(motorptsodd)];
+            
+        end
+        
+        mixedptsoddsum = [mixedptsoddsum; sum(mixedptsodd)];
+        memptsevensum = [memptsevensum; sum(memptseven)];
+        
+        if strcmp(subs{n}, 'MSC09')
+            
+%            if SplitHalf == 1 && ConcatenateTaskData == 1
+        
+                motorptsevensum = [motorptsevensum; 9999];
+                
+%             else
+                 
+%                 motorptsevensum = [motorptsevensum; sum(motorptseven)];
+                 
+%             end
+            
+        else
+            
+            motorptsevensum = [motorptsevensum; sum(motorptseven)];
+            
+        end
+        
+        mixedptsevensum = [mixedptsevensum; sum(mixedptseven)];
+        
+    end
+    
+    if SplitHalf == 1 && MatchAcrossTasks == 1 && ConcatenateTasks == 1
+        
+        mintasksamps = min(min([memptsoddsum motorptsoddsum mixedptsoddsum memptsevensum motorptsevensum mixedptsevensum]))/3;
+    
+    elseif SplitHalf == 1
+    
+        mintasksamps = min(min([memptsoddsum motorptsoddsum mixedptsoddsum memptsevensum motorptsevensum mixedptsevensum]));
+        
+    elseif ConcatenateTasks == 1
+        
+        mintasksamps = min(min([(memptsoddsum + memptsevensum)  (motorptsoddsum + motorptsevensum)  (mixedptsoddsum + mixedptsevensum)]));
+        
+    end
+    
+end
+
+
+>>>>>>> b13c67354ef986896c2fa8915a45372471bf4945
 for i=1:numel(subs)
     
     disp(sprintf('Creating dconn for subject %s: %s', subs{i}, datestr(now)));
@@ -56,6 +187,7 @@ for i=1:numel(subs)
     %data for a task
     for j=1:length(tasks)
     	if MatchData == 1 && SplitHalf == 1
+<<<<<<< HEAD
             load ([QCFiles_path subs{i} '_QCFile.mat']);
             
             memptsodd = [];
@@ -75,6 +207,43 @@ for i=1:numel(subs)
                     memptseven = [memptseven; SubStruct(u).MemSampPts];
                     mixedptseven = [mixedptseven; SubStruct(u).MixedSampPts];
                     motorptseven = [motorptseven; SubStruct(u).MotorSampPts];
+=======
+            
+                load (['/projects/b1081/member_directories/bkraus/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
+        
+                memptsodd = [];
+                motorptsodd = [];
+                mixedptsodd = [];
+                memptseven = [];
+                motorptseven = [];
+                mixedptseven = [];
+        
+                for u = 1:length(SubStruct)
+            
+                    if SubStruct(u).OddEven == 1
+                
+                        memptsodd = [memptsodd; SubStruct(u).MemSampPts];
+                        mixedptsodd = [mixedptsodd; SubStruct(u).MixedSampPts];
+                        motorptsodd = [motorptsodd SubStruct(u).MotorSampPts];
+                
+                    elseif SubStruct(u).OddEven == 2
+                
+                        memptseven = [memptseven; SubStruct(u).MemSampPts];
+                        mixedptseven = [mixedptseven; SubStruct(u).MixedSampPts];
+                        motorptseven = [motorptseven; SubStruct(u).MotorSampPts];
+      
+                    end
+                end
+            
+                if strcmp(subs{i}, 'MSC09')  %% Removes motor task from consideration for MSC09
+                
+                    minsampspts = min([sum(memptsodd) sum(mixedptsodd) sum(memptseven) sum(mixedptseven)]);
+                
+                else
+        
+                    minsampspts = min([sum(memptsodd) sum(mixedptsodd) sum(motorptsodd) sum(memptseven) sum(mixedptseven) sum(motorptseven)]);
+                
+>>>>>>> b13c67354ef986896c2fa8915a45372471bf4945
                 end
             end
 
@@ -218,8 +387,15 @@ for i=1:numel(subs)
                 end
             end
             
+<<<<<<< HEAD
         elseif MatchData == 1         
                 load ([QCFiles_path subs{i} '_QCFile.mat']);
+=======
+        elseif MatchData == 1
+            
+
+                load (['/projects/b1081/member_directories/bkraus/Brian_MSC/QC_files/' subs{i} '_QCFile.mat']);
+>>>>>>> b13c67354ef986896c2fa8915a45372471bf4945
         
                 mempts = [];
                 motorpts = [];
@@ -420,8 +596,12 @@ for i=1:numel(subs)
     if SaveTimeseries == 1          %% Save concatenated FC processed timeseries  
         if SplitHalf == 1
             
+<<<<<<< HEAD
             % creates template for timeseries from MSC01 data
             timeseriestemplate = ft_read_cifti_mod(template_path);
+=======
+            timeseriestemplate = ft_read_cifti_mod('/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
+>>>>>>> b13c67354ef986896c2fa8915a45372471bf4945
             timeseriestemplate.data = [];
             timeseriestemplate2 = timeseriestemplate;
         
@@ -441,8 +621,13 @@ for i=1:numel(subs)
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_FCProcessed_Timeseries_Matched_Even_allTaskCat_cortex'],timeseriestemplate2)
             
         else
+<<<<<<< HEAD
             % creating template from MSC01 data
             timeseriestemplate = ft_read_cifti_mod(template_path);
+=======
+        
+            timeseriestemplate = ft_read_cifti_mod('/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
+>>>>>>> b13c67354ef986896c2fa8915a45372471bf4945
             timeseriestemplate.data = [];
             
             %adding data to template
@@ -457,10 +642,28 @@ for i=1:numel(subs)
         end
     end
     
+<<<<<<< HEAD
     % Make and save rmat       
     disp('Loading template: MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
     template = ft_read_cifti_mod(template_path);    
      
+=======
+    % Make and save rmat
+    if CortexOnly == 1
+        
+    	disp('Loading template: MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');
+    	template = ft_read_cifti_mod('/projects/b1081/member_directories/bkraus/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii');    
+        
+    else
+    
+    	%disp(sprintf('Reading %s: %s', [MSCciftidir '/' vcid], datestr(now)));
+    	%template = ft_read_cifti_mod([MSCciftidir '/' vcid]);
+        disp(sprintf('Reading %s: %s', '/projects/b1081/MSC/TaskFC/FCProc_MSC01_mem_pass2/cifti_timeseries_normalwall_native_freesurf/vc38671_LR_surf_subcort_333_32k_fsLR_smooth2.55.dtseries.nii', datestr(now)));
+        template = ft_read_cifti_mod('/projects/b1081/MSC/TaskFC/FCProc_MSC01_mem_pass2/cifti_timeseries_normalwall_native_freesurf/vc38671_LR_surf_subcort_333_32k_fsLR_smooth2.55.dtseries.nii');
+
+    end
+    
+>>>>>>> b13c67354ef986896c2fa8915a45372471bf4945
     template.data = [];
     template.dimord = 'pos_pos';
     template.hdr.dim(6) = template.hdr.dim(7);
@@ -548,12 +751,75 @@ for i=1:numel(subs)
         
         if MakeVariantMap == 1            
             outputfile1 = [subs{i} '_allTaskCat_EvenSessions_cortex'];
+<<<<<<< HEAD
             outputfile2 = [subs{i} '_allTaskCat_OddSessions_cortex'];            
         end    
     elseif ConcatenateTasks == 1 && RandSample == 1    
         if MakeDconn == 1         
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_allTaskCat_cortex'], datestr(now)));
             ft_write_cifti_mod([outdir '/' subs{i} '_allTaskCat_cortex'],template)        
+=======
+            outputfile2 = [subs{i} '_allTaskCat_OddSessions_cortex'];
+            
+        end
+        
+    elseif SplitHalf == 1 && ConcatenateTasks == 1 && CortexOnly == 1
+        
+        if MakeDconn == 1 
+            
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_allTaskCat_OddSessions_FullData_cortex'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_allTaskCat_OddSessions_FullData_cortex'],template)
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_allTaskCat_EvenSessions_FullData_cortex'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_allTaskCat_EvenSessions_FullData_cortex'],template2)
+        
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile1 = [subs{i} '_allTaskCat_EvenSessions_FullData_cortex'];
+            outputfile2 = [subs{i} '_allTaskCat_OddSessions_FullData_cortex'];
+            
+        end
+    
+    elseif ConcatenateTasks == 1 && CortexOnly == 1 && RandSample == 1
+    
+        if MakeDconn == 1 
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_allTaskCat_cortex'], datestr(now)));
+            ft_write_cifti_mod([outdir '/' subs{i} '_allTaskCat_cortex'],template)
+        
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile = [subs{i} '_allTaskCat_cortex'];
+            
+        end
+        
+    elseif ConcatenateTasks == 1 && CortexOnly == 1
+        
+        if MakeDconn == 1 
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_allTaskCat_Consec_cortex'], datestr(now)));
+            ft_write_cifti_mod([outdir '/' subs{i} '_allTaskCat_Consec_cortex'],template)
+        
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile = [subs{i} '_allTaskCat_Consec_cortex'];
+            
+        end
+        
+    elseif ConcatenateTasks == 1 && RandSample == 1
+        
+        if MakeDconn == 1 
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_allTaskCat_subcort'], datestr(now)));
+            ft_write_cifti_mod([outdir '/' subs{i} '_allTaskCat_subcort'],template)
+        
+>>>>>>> b13c67354ef986896c2fa8915a45372471bf4945
         end
         
         if MakeVariantMap == 1            
@@ -570,10 +836,40 @@ for i=1:numel(subs)
         
         if MakeVariantMap == 1            
             outputfile1 = [subs{i} '_' tasks{j} '_matcheddata_EvenSessions_cortex'];
+<<<<<<< HEAD
             outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_OddSessions_cortex'];            
         end             
     elseif SplitHalf == 1 && MatchData == 1        
         if MakeDconn == 1             
+=======
+            outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_OddSessions_cortex'];
+            
+        end
+        
+    elseif SplitHalf == 1 && CortexOnly == 1 && MatchData == 1 && numel(subs) == 8
+        
+        if MakeDconn == 1 
+            
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_OddSessions_cortex'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_OddSessions_cortex'],template)
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_EvenSessions_cortex'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_EvenSessions_cortex'],template2)
+        
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile1 = [subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_OddSessions_cortex'];
+            outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_NoMSC09_Consec_EvenSessions_cortex'];
+            
+        end
+        
+    elseif SplitHalf == 1 && CortexOnly == 1 && MatchData == 1
+        
+        if MakeDconn == 1 
+            
+>>>>>>> b13c67354ef986896c2fa8915a45372471bf4945
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_matcheddata_Consec_OddSessions_cortex'], datestr(now)));
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_matcheddata_Consec_OddSessions_cortex'],template)
         
@@ -581,12 +877,26 @@ for i=1:numel(subs)
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_matcheddata_Consec_EvenSessions_cortex'],template2)        
         end
         
+<<<<<<< HEAD
         if MakeVariantMap == 1            
             outputfile1 = [subs{i} '_' tasks{j} '_matcheddata_Consec_EvenSessions_cortex'];
             outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_Consec_OddSessions_cortex'];            
         end        
     elseif SplitHalf == 1 && RandSample == 1        
         if MakeDconn == 1             
+=======
+        if MakeVariantMap == 1
+            
+            outputfile1 = [subs{i} '_' tasks{j} '_matcheddata_Consec_OddSessions_cortex'];
+            outputfile2 = [subs{i} '_' tasks{j} '_matcheddata_Consec_EvenSessions_cortex'];
+            
+        end
+        
+    elseif SplitHalf == 1 && CortexOnly == 1 && RandSample == 1
+        
+        if MakeDconn == 1 
+            
+>>>>>>> b13c67354ef986896c2fa8915a45372471bf4945
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_OddSessions_cortex'], datestr(now)));
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_OddSessions_cortex'],template)
         
@@ -594,12 +904,60 @@ for i=1:numel(subs)
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_EvenSessions_cortex'],template2)        
         end
         
+<<<<<<< HEAD
         if MakeVariantMap == 1            
             outputfile1 = [subs{i} '_' tasks{j} '_EvenSessions_cortex'];
             outputfile2 = [subs{i} '_' tasks{j} '_OddSessions_cortex'];           
         end
     elseif RandSample == 1        
         if MakeDconn == 1         
+=======
+        if MakeVariantMap == 1
+            
+            outputfile1 = [subs{i} '_' tasks{j} '_OddSessions_cortex'];
+            outputfile2 = [subs{i} '_' tasks{j} '_EvenSessions_cortex'];
+            
+        end
+        
+    elseif SplitHalf == 1 && RandSample == 1
+        
+        if MakeDconn == 1 
+            
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_OddSessions_subcort'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_OddSessions_subcort'],template)
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_EvenSessions_subcort'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_EvenSessions_subcort'],template2)
+        
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile1 = [subs{i} '_' tasks{j} '_OddSessions_subcort'];
+            outputfile2 = [subs{i} '_' tasks{j} '_EvenSessions_subcort'];
+            
+        end
+        
+    elseif CortexOnly == 1 && MatchData == 1 && RandSample == 0
+        
+        if MakeDconn == 1 
+        
+            disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_AllSessions_Consec_cortex'], datestr(now)));
+            ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_AllSessions_Consec_cortex'],template)
+            
+        end
+        
+        if MakeVariantMap == 1
+            
+            outputfile = [subs{i} '_' tasks{j} '_AllSessions_Consec_cortex'];
+            
+        end
+        
+    elseif CortexOnly == 1 && RandSample == 1
+        
+        if MakeDconn == 1 
+        
+>>>>>>> b13c67354ef986896c2fa8915a45372471bf4945
             disp(sprintf('Writing %s: %s', [outdir '/' subs{i} '_' tasks{j} '_AllSessions_cortex'], datestr(now)));
             ft_write_cifti_mod(['/' outdir '/' subs{i} '_' tasks{j} '_AllSessions_cortex'],template)            
         end
