@@ -19,7 +19,7 @@ rest_path = '/projects/b1081/MSC/MSCdata_v1/'; %specify location of rest data
 output_path = '/home/btk2142/output_files/variant_maps'; %%%%%% WHAT IS THE DIFFERENCE BETWEEN THIS AND outdir?
 template_path = '/projects/b1081/Brian_MSC/dconn_scripts/templates/MSC01_allses_mean_native_freesurf_vs_120sub_corr.dtseries.nii'; %location of correlation map (???) to be used as template
 cd '/projects/b1081';   %% Change CD to root project directory
-%% Options - deleted RestOnly (default is 0), SubSample (default is 1), ConcatenateSplitHalf (default is 0)
+%% Options
 SplitHalf = 1;  %% Toggles whether to calculate rest for split-half of sessions
 RandSample = 1; %% Toggles random subsampling of tmask on/off
 MatchData = 1; %% Toggles whether to match the amount of data per task as the lowest value within each split-half
@@ -1203,12 +1203,17 @@ for i=1:numel(subs)
         %% Creates Spatial Correlation Maps
         % createSptlcorr_MSCdconns(groupAvgLoc,groupAvgName,cortexOnly,outputdir,dconnData,
         % outputname)
-        if CreateVariant == 1 && SplitHalf == 1 && WriteDconn == 0            
+        if CreateVariant == 1 && SplitHalf == 1 && WriteDconn == 0
+            
             disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData1,1), size(catData1,2), datestr(now)));
-            template.data = paircorr_mod(catData1');            
-            catData1 = [];            
-            createSptlcorr_MSCdconns(groupavg_path, groupavg_name,1,output_path,template.data, outputfile1)            
-            template.data = [];            
+            template.data = paircorr_mod(catData1');
+            
+            catData1 = [];
+            
+            createSptlcorr_MSCdconns(groupavg_path, groupavg_name,1,output_path,template.data, outputfile1)
+            
+            template.data = [];
+            
             disp(sprintf('Running Correlations: on data size %i by %i, %s', size(catData2,1), size(catData2,2), datestr(now)));
             template2.data = paircorr_mod(catData2');
             

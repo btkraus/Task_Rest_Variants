@@ -60,8 +60,6 @@ function [mintasksamps] = mintasksamps(QCFiles_path, subs, SplitHalf, Concatenat
             motorptsoddsum = [motorptsoddsum; sum(motorptsodd)];
             motorptsevensum = [motorptsevensum; sum(motorptseven)];
         end
-
-        
     end
     
     %finds minimum number of sample points to match the other tasks across
