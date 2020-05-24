@@ -1,4 +1,4 @@
-% This script makes Dconns (if the MakeDconn variable = 1) and variant files
+% %This script makes Dconns (if the MakeDconn variable = 1) and variant files
 % (if VariantMap = 1)for rest data of each subject's even and odd sessions. 
 % QC files need to be na med [subject]_QCFile.mat, ex. 'MSC01_QCFile.mat'
 % Written by Brian Kraus, edited by Diana Perez.
