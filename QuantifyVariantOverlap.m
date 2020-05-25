@@ -7,17 +7,17 @@ clear all
 
 %% Paths
 % Specify output directories    
-outputdir = '/Users/dianaperez/Box/Latest_Analysis_Replication/Variant_Overlap_Plots/Thresholded_Plots/';
-dirpath = '/Users/dianaperez/Documents/GitHub/Task_Rest_Variants/'; %location of txt files
+outputdir = '/Users/diana/Desktop/Reliability_figure';
+dirpath = '/Users/diana/Desktop/Reliability_figure/'; %location of txt files
 % names of txt files
-spCorrRestEvenTxt = 'MSC_rest_spCorrMaps_Even.txt';
-spCorrRestOddTxt = 'MSC_rest_spCorrMaps_Odd.txt';
-spCorrTaskEvenTxt = 'MSC_task_spCorrMaps_Even.txt';
-spCorrTaskOddTxt = 'MSC_task_spCorrMaps_Odd.txt';
-varMapsRestEvenTxt = 'MSC_rest_varMaps_Even.txt';
-varMapsRestOddTxt = 'MSC_rest_varMaps_Odd.txt';
-varMapsTaskEvenTxt = 'MSC_task_varMaps_Even.txt';
-varMapsTaskOddTxt = 'MSC_task_varMaps_Odd.txt';
+spCorrRestEvenTxt = 'MSC_spCorr_Even_rest.txt';
+spCorrRestOddTxt = 'MSC_spCorr_Odd_rest.txt';
+spCorrTaskEvenTxt = 'MSC_spCorr_Even_task.txt';
+spCorrTaskOddTxt = 'MSC_spCorr_Odd_task.txt';
+varMapsRestEvenTxt = 'MSC_varMaps_Even_rest.txt';
+varMapsRestOddTxt = 'MSC_varMaps_Odd_rest.txt';
+varMapsTaskEvenTxt = 'MSC_varMaps_Even_task.txt';
+varMapsTaskOddTxt = 'MSC_varMaps_Odd_task.txt';
 if ~isfolder(outputdir)
     mkdir(outputdir) % creates output directory if it doesn't already exist
 end
@@ -255,9 +255,9 @@ nfiles = length(rest_files_even);
             alltaskfilestask = [alltaskfilestask; cifti_task.data'];
             alltaskfilesrest = [alltaskfilesrest; cifti_rest.data']; 
         end
-    end    
+    end 
+    
     %% Add temp variables to final variables, put these with descriptive stats
-
     NumVariantsTaskOdd = [NumVariantsTaskOdd NumVariantsTaskOddTemp];
     NumVariantsTaskEven = [NumVariantsTaskEven NumVariantsTaskEvenTemp];
     NumVariantsRestOdd = [NumVariantsRestOdd NumVariantsRestOddTemp];
@@ -271,7 +271,6 @@ nfiles = length(rest_files_even);
     MedianSizeVariantsRestOdd = [MedianSizeVariantsRestOdd MedianSizeVariantsRestOddTemp];
     MedianSizeVariantsRestEven = [MedianSizeVariantsRestEven MedianSizeVariantsRestEvenTemp];
 
-    %% CHECK STARTING HERE!!!! COMPARE TO OLD SCRIPT
     if randomizevals == 1
         if permvals == 1
             
@@ -289,11 +288,11 @@ nfiles = length(rest_files_even);
                     for n = loopvals
                         Count = Count+1;
                         if l == 1
-                            restdat = alltaskfilesrestodd(m,:);
-                            taskdat = alltaskfilestaskeven(n,:);
+                            restdat = alltaskfilesrestodd(:,m);
+                            taskdat = alltaskfilestaskeven(:,n);
                         else
-                            restdat = alltaskfilesresteven(m,:);
-                            taskdat = alltaskfilestaskodd(n,:);
+                            restdat = alltaskfilesresteven(:,m);
+                            taskdat = alltaskfilestaskodd(:,n);
                         end
 
                         dcorrdata = [];
@@ -389,7 +388,7 @@ nfiles = length(rest_files_even);
                             end            
                         end
                     
-                        if isempty(dcorrdata                        
+                        if isempty(dcorrdata)                        
                             dc = 0;                        
                         else        
                             dc = dice_coefficient_mod(dcorrdata(:,1),dcorrdata(:,2));                        

@@ -8,17 +8,18 @@ clear all
 %% Paths
 %change paths
 workbenchdir = '/Applications/workbench/bin_macosx64/';
-leftsurf = '/Users/diana/Box/Dependencies/32k_ConteAtlas_v2_distribute/Conte69.L.midthickness.32k_fs_LR.surf.gii';
-rightsurf = '/Users/diana/Box/Dependencies/32k_ConteAtlas_v2_distribute/Conte69.R.midthickness.32k_fs_LR.surf.gii';
-dirpath = '/Users/diana/Documents/GitHub/Task_Rest_Variants/';
-resttxtname = 'MSC_rest_varmaps_even.txt';
-tasktxtname = 'MSC_task_varmaps_even.txt';
-SNRpath = '/Users/diana/Box/Quest_Backup/member_directories/bkraus/BrianMSC/dconn_task_files/SNR_Maps/';
-outfilepath = '/Users/diana/Box/Latest_Analysis_Replication/';
+leftsurf = '/Users/diana/Desktop/Dependencies/32k_ConteAtlas_v2_distribute/Conte69.L.midthickness.32k_fs_LR.surf.gii';
+rightsurf = '/Users/diana/Desktop/Dependencies/32k_ConteAtlas_v2_distribute/Conte69.R.midthickness.32k_fs_LR.surf.gii';
+dirpath = '/Users/diana/Desktop/Reliability_figure/';
+resttxtname = 'MSC_spCorr_Odd_rest.txt';
+tasktxtname = 'MSC_spCorr_Odd_task.txt';
+SNRpath = '/Users/diana/Desktop/Reliability_figure/SNR_Maps/';
+outfilepath = '/Users/diana/Desktop/Reliability_figure/';
 
 %%
 threshold = 2.5;  %% Thresholds used to calculate variants (lowest % or correlation values)
 SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR, 1 = exclude, 0 = don't exclude
+ExcludeBySize = 1;
 
 %%
     % reads file paths, sub numbers split-halves from txt files    
@@ -37,7 +38,7 @@ SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR, 1 = excl
         %%
         % if you want to exclude low signal regions, this will exclude by SNR
         if SNRexclusion == 1
-            SNRmap = ft_read_cifti_mod([SNRpath subject '/' subject '__SNRMap__AllDataConcatenated.dscalar.nii']);
+            SNRmap = ft_read_cifti_mod([SNRpath '/' subject '_SNRMap_REST_MSCTemplate_AllSessions.4dfp.img_LR_surf_subcort_333_32k_fsLR.dscalar.nii']);
             
             SNRmap.data = SNRmap.data(1:59412,:);
             SNRexclude = find(SNRmap.data < 750);
@@ -79,25 +80,19 @@ SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR, 1 = excl
             end
         end
         %%
-        
-        if ExcludeBySize == 1 
-            
-            [cifti_rest.data, cifti_task.data] = ExcludeVariantSize(cifti_rest_final_dat, cifti_task_final_dat, subject, theshold);
-            
-        end 
-        
+
         %This creates the output file names for rest and task 
         outfilerest = strrep(rest_files{x}, 'vs_120_allsubs_corr_cortex_corr', ['ThresholdedVariantMap_SNRExclude_' num2str(threshold)]);
         outfiletask = strrep(task_files{x}, 'cortex_vs_120_allsubs_corr_cortex_corr', ['ThresholdedVariantMap_SNRExclude_' num2str(threshold)]);
         
         strrest = ['SNRExclude_' restsplithalf{x}];
         strtask = ['SNRExclude_' tasksplithalf{x}];
-        outfilewbtask = [outfilepath subject '/' subject '_matcheddata_Variant_Size_' strtask '_' num2str(threshold) '.dtseries.nii'];
-        outfilewbrest = [outfilepath subject '/' subject '_matcheddata_REST_Variant_Size_' strrest '_' num2str(threshold) '.dtseries.nii'];
+        outfilewbtask = [outfilepath '/' subject '_matcheddata_Variant_Size_' strtask '_' num2str(threshold) '.dtseries.nii'];
+        outfilewbrest = [outfilepath '/' subject '_matcheddata_REST_Variant_Size_' strrest '_' num2str(threshold) '.dtseries.nii'];
 
         %this creates and writes the file in cifti format
-%         cifti_rest.data = cifti_rest_final_dat;
-%         cifti_task.data = cifti_task_final_dat;
+        cifti_rest.data = cifti_rest_final_dat;
+        cifti_task.data = cifti_task_final_dat;
         
         ft_write_cifti_mod(outfilerest, cifti_rest)
         ft_write_cifti_mod(outfiletask, cifti_task)
@@ -107,5 +102,20 @@ SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR, 1 = excl
         system([workbenchdir 'wb_command -cifti-find-clusters ' outfilerest ' 0 0 0 0 COLUMN ' outfilewbrest ' -left-surface ' leftsurf ' -right-surface ' rightsurf])
         system([workbenchdir 'wb_command -cifti-find-clusters ' outfiletask ' 0 0 0 0 COLUMN ' outfilewbtask ' -left-surface ' leftsurf ' -right-surface ' rightsurf])
 
+        % writes file with numbered clusters in preparation for size
+        % exclusion
+        cifti_rest = ft_read_cifti_mod(outfilewbrest);
+        cifti_task = ft_read_cifti_mod(outfilewbtask);
+
+        if ExcludeBySize == 1             
+            % exclusion criteria is set to 15 vertices (any variant less
+            % than 15 vertices big will be excluded
+            [cifti_rest.data, cifti_task.data] = ExcludeVariantSize(cifti_rest.data, cifti_task.data, subject, threshold, 15);
+            
+        end 
+        
+        % writes size-excluded variant masks
+        ft_write_cifti_mod(outfilerest, cifti_rest)
+        ft_write_cifti_mod(outfiletask, cifti_task)
     end
 
