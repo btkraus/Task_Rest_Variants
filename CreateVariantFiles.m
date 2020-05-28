@@ -17,7 +17,7 @@ SNRpath = '/Users/diana/Desktop/Reliability_figure/SNR_Maps/';
 outfilepath = '/Users/diana/Desktop/Reliability_figure/';
 
 %%
-threshold = 2.5;  %% Thresholds used to calculate variants (lowest % or correlation values)
+threshold = 5;  %% Thresholds used to calculate variants (lowest % or correlation values)
 SNRexclusion = 1;  %% Toggles whether to exclude variants based on SNR, 1 = exclude, 0 = don't exclude
 ExcludeBySize = 1;
 
@@ -110,7 +110,7 @@ ExcludeBySize = 1;
         if ExcludeBySize == 1             
             % exclusion criteria is set to 15 vertices (any variant less
             % than 15 vertices big will be excluded
-            [cifti_rest.data, cifti_task.data] = ExcludeVariantSize(cifti_rest.data, cifti_task.data, subject, threshold, 15);
+            [cifti_rest.data, cifti_task.data] = ExcludeVariantSize(cifti_rest.data, cifti_task.data, subject, threshold, 50);
             
         end 
         

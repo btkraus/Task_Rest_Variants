@@ -1,26 +1,9 @@
 %% QuantifyVariantOverlap.m 
 %This script compares variant locations between rest-rest, task-task, rest-task
 %It makes plots that quantify how much they overlap between conditions
-%Written by Brian Kraus. Edited by Diana Perez.
 
 clear all
 
-%% Paths
-% Specify output directories    
-outputdir = '/Users/diana/Desktop/Reliability_figure';
-dirpath = '/Users/diana/Desktop/Reliability_figure/'; %location of txt files
-% names of txt files
-spCorrRestEvenTxt = 'MSC_spCorr_Even_rest.txt';
-spCorrRestOddTxt = 'MSC_spCorr_Odd_rest.txt';
-spCorrTaskEvenTxt = 'MSC_spCorr_Even_task.txt';
-spCorrTaskOddTxt = 'MSC_spCorr_Odd_task.txt';
-varMapsRestEvenTxt = 'MSC_varMaps_Even_rest.txt';
-varMapsRestOddTxt = 'MSC_varMaps_Odd_rest.txt';
-varMapsTaskEvenTxt = 'MSC_varMaps_Even_task.txt';
-varMapsTaskOddTxt = 'MSC_varMaps_Odd_task.txt';
-if ~isfolder(outputdir)
-    mkdir(outputdir) % creates output directory if it doesn't already exist
-end
 %% Specify these conditions
 DiceCorr = 1;  %% Toggles whether to calculate dice correlations for all subjects
 plotresults = 1;  %% Toggles whether to plot results for each comparison
@@ -34,7 +17,34 @@ BoxPlot = 1;  %% Toggles whether to plot a box plot for the group level results
 BoxPlotBySubject = 1;  %% Toggles whether to display boxplot by subjects instead of by comparison
 FinalFigure = 1;  %% Toggles whether to plot the final figure (Figure 1) for the paper
 AbsoluteThresholds = 0;  %% Toggles whether thresholds are absolute values or percents
-thresholds = [2.5];  %% Sets the thresholds of files to load
+thresholds = [5];  %% Sets the thresholds of files to load
+
+%% Paths
+% Specify output directories    
+outputdir = '/Users/diana/Desktop/Reliability_figure';
+dirpath = '/Users/diana/Desktop/Reliability_figure/'; %location of txt files
+% names of txt files
+if SplitHalf == 1
+    spCorrRestEvenTxt = 'MSC_spCorr_Even_rest.txt';
+    spCorrRestOddTxt = 'MSC_spCorr_Odd_rest.txt';
+    spCorrTaskEvenTxt = 'MSC_spCorr_Even_task.txt';
+    spCorrTaskOddTxt = 'MSC_spCorr_Odd_task.txt';
+    varMapsRestEvenTxt = 'MSC_varMaps_Even_rest.txt';
+    varMapsRestOddTxt = 'MSC_varMaps_Odd_rest.txt';
+    varMapsTaskEvenTxt = 'MSC_varMaps_Even_task.txt';
+    varMapsTaskOddTxt = 'MSC_varMaps_Odd_task.txt';
+else
+    spCorrRestTxt = 'MSC_spCorr_rest.txt';
+    spCorrTaskTxt = 'MSC_spCorr_task.txt';
+    varMapsRestTxt = 'MSC_varMaps_rest.txt';
+    varMapsTaskTxt = 'MSC_varMaps_task.txt';
+end
+
+if ~isfolder(outputdir)
+    mkdir(outputdir) % creates output directory if it doesn't already exist
+end
+
+
 %% Create variables for number of variants/average size    
 NumVariantsTaskOdd = [];
 NumVariantsTaskEven = [];
@@ -288,11 +298,11 @@ nfiles = length(rest_files_even);
                     for n = loopvals
                         Count = Count+1;
                         if l == 1
-                            restdat = alltaskfilesrestodd(:,m);
-                            taskdat = alltaskfilestaskeven(:,n);
+                            restdat = alltaskfilesrestodd(m,:);
+                            taskdat = alltaskfilestaskeven(n,:);
                         else
-                            restdat = alltaskfilesresteven(:,m);
-                            taskdat = alltaskfilestaskodd(:,n);
+                            restdat = alltaskfilesresteven(m,:);
+                            taskdat = alltaskfilestaskodd(n,:);
                         end
 
                         dcorrdata = [];
