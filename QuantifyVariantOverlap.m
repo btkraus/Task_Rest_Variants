@@ -6,10 +6,12 @@ AnyOverlap = 0;  %% Toggles whether to calculate if any portion of a variant ove
 COMOverlap = 0;  %% Toggles whether to calculate if the center of mass of each variant shows overlap
 plotresults = 1;  %% Toggles whether to plot results for each comparison
 FullMaps = 0;  %% Toggles whether to use all task and rest data for each subject
+ConsecSample = 1;   %% Toggles whether to use consecutively sampled maps
 SplitHalf = 1;  %% Toggles whether to calculate a split-half 
 MatchedMaps = 1;  %% Toggles whether to use a matched amount of task and rest data for each subject
 SNRExclude = 1;  %% Toggles whether to use data excluded for low SNR
 SizeExclude = 1;  %% Toggles whether to exclude small variants
+minsize = 50;     %% Minimum size variants for size exclusion
 randomizevals = 1;  %% Toggles whether to calculate a null distribution across subjects
 permvals = 1; %% Toggles whether to calculate a permutation of all possible combinations instead of bootstrapping
 BarGraph = 0;  %% Toggles whether to plot a bar graph for the group level results
@@ -20,7 +22,7 @@ SubjectPlots = 0;  %% Toggles whether to plot subject level results
 
 
 AbsoluteThresholds = 0;  %% Toggles whether thresholds are absolute values or percents
-thresholds = [2.5 10];  %% Sets the thresholds of files to load
+thresholds = [2.5 5];  %% Sets the thresholds of files to load
 
 if AbsoluteThresholds == 1 && numel(thresholds) > 1
     
@@ -131,14 +133,16 @@ for v = 1:numel(thresholds)
         [task_files_odd, subjects1, tasks1] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/Thresholded_Maps/Absolute_Thresholds/Split_Half/MSC_alltask_odd_varmaps_' num2str(thresholds(v)) '.txt'],'%s%s%s');
 
         [rest_files_odd, subjects2, tasks2] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/Thresholded_Maps/Absolute_Thresholds/Split_Half/MSC_rest_odd_varmaps_' num2str(thresholds(v)) '.txt'],'%s%s%s');
-    
-        [task_masks_even, ~, ~] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/Thresholded_Maps/Absolute_Thresholds/Split_Half/MSC_alltask_even_varmaps_variants_SNRexclude_sizeexclude_' num2str(thresholds(v)) '.txt'],'%s%s%s');
+        
+ 	elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1 && ConsecSample == 1 && numel(thresholds) > 1
+        
+        [task_files_even, ~, ~] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_' num2str(thresholds(v)) '_splithalf_even_consec_matched_variants_SNRexclude.txt'],'%s%s%s');
 
-        [rest_masks_even, ~, ~] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/Thresholded_Maps/Absolute_Thresholds/Split_Half/MSC_rest_even_varmaps_variants_SNRexclude_sizeexclude_' num2str(thresholds(v)) '.txt'],'%s%s%s');
+        [rest_files_even, ~, ~] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_' num2str(thresholds(v)) '_splithalf_even_consec_matched_variants_SNRexclude.txt'],'%s%s%s');
     
-        [task_masks_odd, sub1, t1] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/Thresholded_Maps/Absolute_Thresholds/Split_Half/MSC_alltask_odd_varmaps_variants_SNRexclude_sizeexclude_' num2str(thresholds(v)) '.txt'],'%s%s%s');
+        [task_files_odd, subjects1, tasks1] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_' num2str(thresholds(v)) '_splithalf_odd_consec_matched_variants_SNRexclude.txt'],'%s%s%s');
 
-        [rest_masks_odd, sub2, t2] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/Thresholded_Maps/Absolute_Thresholds/Split_Half/MSC_rest_odd_varmaps_variants_SNRexclude_sizeexclude_' num2str(thresholds(v)) '.txt'],'%s%s%s');
+        [rest_files_odd, subjects2, tasks2] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_' num2str(thresholds(v)) '_splithalf_odd_consec_matched_variants_SNRexclude.txt'],'%s%s%s');
         
     elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1
         
@@ -149,14 +153,6 @@ for v = 1:numel(thresholds)
         [task_files_odd, subjects1, tasks1] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_' num2str(thresholds(v)) '_splithalf_odd_matched_variants_SNRexclude.txt'],'%s%s%s');
 
         [rest_files_odd, subjects2, tasks2] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_' num2str(thresholds(v)) '_splithalf_odd_matched_variants_SNRexclude.txt'],'%s%s%s');
-    
-        [task_masks_even, ~, ~] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_' num2str(thresholds(v)) '_splithalf_even_matched_variants_SNRexclude_sizeexclude.txt'],'%s%s%s');
-
-        [rest_masks_even, ~, ~] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_' num2str(thresholds(v)) '_splithalf_even_matched_variants_SNRexclude_sizeexclude.txt'],'%s%s%s');
-    
-        [task_masks_odd, sub1, t1] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_' num2str(thresholds(v)) '_splithalf_odd_matched_variants_SNRexclude_sizeexclude.txt'],'%s%s%s');
-
-        [rest_masks_odd, sub2, t2] = textread(['/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_' num2str(thresholds(v)) '_splithalf_odd_matched_variants_SNRexclude_sizeexclude.txt'],'%s%s%s');
         
     elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1 && numel(thresholds) > 1 && AbsoluteThresholds == 1
         
@@ -188,23 +184,11 @@ for v = 1:numel(thresholds)
 
         [rest_files_odd, subjects2, tasks2] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_splithalf_odd_matched_variants_SizeOnly.txt','%s%s%s');
     
-        [task_masks_even, ~, ~] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_splithalf_even_matched_variants_SNRexclude_sizeexclude.txt','%s%s%s');
-
-        [rest_masks_even, ~, ~] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_splithalf_even_matched_variants_SNRexclude_sizeexclude.txt','%s%s%s');
-    
-        [task_masks_odd, sub1, t1] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_splithalf_odd_matched_variants_SNRexclude_sizeexclude.txt','%s%s%s');
-
-        [rest_masks_odd, sub2, t2] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_splithalf_odd_matched_variants_SNRexclude_sizeexclude.txt','%s%s%s');
-    
     elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1
     
         [task_files, subjects1, tasks1] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_matched_variants_SizeOnly.txt','%s%s%s');
 
         [rest_files, subjects2, tasks2] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_matched_variants_SizeOnly.txt','%s%s%s');
-    
-        [task_masks, sub1, t1] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_matched_variants_SNRexclude_sizeexclude.txt','%s%s%s');
-
-        [rest_masks, sub2, t2] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_matched_variants_SNRexclude_sizeexclude.txt','%s%s%s');
     
     elseif MatchedMaps == 1 && SNRExclude == 1 && SplitHalf == 1
     
@@ -232,24 +216,12 @@ for v = 1:numel(thresholds)
 
         [rest_files_odd, subjects2, tasks2] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_splithalf_odd_matched_variants_SizeOnly.txt','%s%s%s');
     
-        [task_masks_even, ~, ~] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_splithalf_even_matched_variants_SizeOnly_sizeexclude.txt','%s%s%s');
-
-        [rest_masks_even, ~, ~] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_splithalf_even_matched_variants_SizeOnly_sizeexclude.txt','%s%s%s');
-    
-        [task_masks_odd, sub1, t1] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_splithalf_odd_matched_variants_SizeOnly_sizeexclude.txt','%s%s%s');
-
-        [rest_masks_odd, sub2, t2] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_splithalf_odd_matched_variants_SizeOnly_sizeexclude.txt','%s%s%s');
-    
     elseif MatchedMaps == 1 && SizeExclude == 1
     
         [task_files, subjects1, tasks1] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_matched_variants_SizeOnly.txt','%s%s%s');
 
         [rest_files, subjects2, tasks2] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_matched_variants_SizeOnly.txt','%s%s%s');
-    
-        [task_masks, sub1, t1] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_matched_variants_SizeOnly_sizeexclude.txt','%s%s%s');
 
-        [rest_masks, sub2, t2] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_rest_varmaps_matched_variants_SizeOnly_sizeexclude.txt','%s%s%s');
-    
     elseif MatchedMaps == 1 && SplitHalf == 1
     
         [task_files_even, ~, ~] = textread('/Users/briankraus/Desktop/Correct_Variant_Maps/MSC_Data/Text_Lists/MSC_alltask_varmaps_splithalf_even_matched_variants_SizeOnly.txt','%s%s%s');
@@ -343,67 +315,142 @@ for v = 1:numel(thresholds)
         
         end
     
-        if SizeExclude == 1         %% Apply exclusion masks for maps that exclude size
-        
+    	if SizeExclude == 1         %% Apply exclusion masks for maps that exclude size
+            
             if SplitHalf == 1
-            
-                cifti_rest_mask_even = ft_read_cifti_mod(rest_masks_even{x});
-                cifti_task_mask_even = ft_read_cifti_mod(task_masks_even{x});
-                cifti_rest_mask_odd = ft_read_cifti_mod(rest_masks_odd{x});
-                cifti_task_mask_odd = ft_read_cifti_mod(task_masks_odd{x});
-        
-                for d = 1:length(cifti_rest_mask_even.data)
-            
-                    if cifti_rest_mask_even.data(d) == 0
                 
-                        cifti_rest_even.data(d) = 0;
+                allvars_rest_even = unique(cifti_rest_even.data);
+                allvars_rest_even(1) = [];
+                allvars_rest_odd = unique(cifti_rest_odd.data);
+                allvars_rest_odd(1) = [];
+                allvars_task_even = unique(cifti_task_even.data);
+                allvars_task_even(1) = [];
+                allvars_task_odd = unique(cifti_task_odd.data);
+                allvars_task_odd(1) = [];
                 
-                    end
+                removevars_rest_even = [];
+                removevars_rest_odd = [];
+                removevars_task_even = [];
+                removevars_task_odd = [];
                 
-                    if cifti_rest_mask_odd.data(d) == 0
+                for g = 1:length(allvars_rest_even)
                     
-                        cifti_rest_odd.data(d) = 0;
-                    
-                    end  
-                end
-        
-                for e = 1:length(cifti_task_mask_even.data)
-            
-                    if cifti_task_mask_even.data(e) == 0
-                
-                        cifti_task_even.data(e) = 0;
-                
-                    end
-                
-                    if cifti_task_mask_odd.data(e) == 0
-                    
-                        cifti_task_odd.data(e) = 0;
-                    
+                    if length(find(cifti_rest_even.data == allvars_rest_even(g))) < minsize
+                        
+                        removevars_rest_even = [removevars_rest_even allvars_rest_even(g)];
+                        
                     end
                 end
-            
+                
+                for h = 1:length(cifti_rest_even.data)
+                    
+                    if ismember(cifti_rest_even.data(h),removevars_rest_even)
+                        
+                        cifti_rest_even.data(h) = 0;
+                        
+                    end
+                end
+                
+                for g = 1:length(allvars_rest_odd)
+                    
+                    if length(find(cifti_rest_odd.data == allvars_rest_odd(g))) < minsize
+                        
+                        removevars_rest_odd = [removevars_rest_odd allvars_rest_odd(g)];
+                        
+                    end
+                end
+                
+                for h = 1:length(cifti_rest_odd.data)
+                    
+                    if ismember(cifti_rest_odd.data(h),removevars_rest_odd)
+                        
+                        cifti_rest_odd.data(h) = 0;
+                        
+                    end
+                end
+                
+                for g = 1:length(allvars_task_even)
+                    
+                    if length(find(cifti_task_even.data == allvars_task_even(g))) < minsize
+                        
+                        removevars_task_even = [removevars_task_even allvars_task_even(g)];
+                        
+                    end
+                end
+                
+                for h = 1:length(cifti_task_even.data)
+                    
+                    if ismember(cifti_task_even.data(h),removevars_task_even)
+                        
+                        cifti_task_even.data(h) = 0;
+                        
+                    end
+                end
+                
+                for g = 1:length(allvars_task_odd)
+                    
+                    if length(find(cifti_task_odd.data == allvars_task_odd(g))) < minsize
+                        
+                        removevars_task_odd = [removevars_task_odd allvars_task_odd(g)];
+                        
+                    end
+                end
+                
+                for h = 1:length(cifti_task_odd.data)
+                    
+                    if ismember(cifti_task_odd.data(h),removevars_task_odd)
+                        
+                        cifti_task_odd.data(h) = 0;
+                        
+                    end
+                end
+                
             else
-        
-                cifti_rest_mask = ft_read_cifti_mod(rest_masks{x});
-                cifti_task_mask = ft_read_cifti_mod(task_masks{x});
-        
-                for d = 1:length(cifti_rest_mask.data)
-            
-                    if cifti_rest_mask.data(d) == 0
                 
-                        cifti_rest.data(d) = 0;
+            	allvars_rest = unique(cifti_rest.data);
+                allvars_rest(1) = [];
+                allvars_task = unique(cifti_task.data);
+                allvars_task(1) = [];
                 
+                removevars_rest = [];
+                removevars_task = [];
+                
+                for g = 1:length(allvars_rest)
+                    
+                    if length(find(cifti_rest.data == allvars_rest(g))) < minsize
+                        
+                        removevars_rest = [removevars_rest allvars_rest(g)];
+                        
                     end
                 end
-        
-                for e = 1:length(cifti_task_mask.data)
-            
-                    if cifti_task_mask.data(e) == 0
                 
-                        cifti_task.data(e) = 0;
-                
+                for h = 1:length(cifti_rest.data)
+                    
+                    if ismember(cifti_rest.data(h),removevars_rest)
+                        
+                        cifti_rest.data(h) = 0;
+                        
                     end
                 end
+                
+                for g = 1:length(allvars_task)
+                    
+                    if length(find(cifti_task.data == allvars_task(g))) < minsize
+                        
+                        removevars_task = [removevars_task allvars_task(g)];
+                        
+                    end
+                end
+                
+                for h = 1:length(cifti_task.data)
+                    
+                    if ismember(cifti_task.data(h),removevars_task)
+                        
+                        cifti_task.data(h) = 0;
+                        
+                    end
+                end
+                
             end
         end
     
@@ -2511,7 +2558,7 @@ for v = 1:numel(thresholds)
 
                         c = get(gca, 'Children');
 
-                        hleg1 = legend(c(1:3), 'Between State Comparison', 'Within State Comparison', 'Between Subject Comparison', 'Location', 'NorthEast');
+                        hleg1 = legend(c(1:3), 'Between State Comparison', 'Within State Comparison', 'Across Subject Comparison', 'Location', 'NorthEast');
                         hleg1.FontSize = 16;
                         ylim([0 1]);
                         
@@ -2848,6 +2895,10 @@ for v = 1:numel(thresholds)
                     filename = strrep(filename, '.jpg', '_pvals.jpg');
             
                 end
+                
+            elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1 && FinalFigure == 1 && ConsecSample == 1
+                
+                filename = ['/AllSubjects_Boxplot_FinalPlotForPaper_ConsecSample_' num2str(thresholds(v)) '_Percent.jpg'];
                 
             elseif MatchedMaps == 1 && SNRExclude == 1 && SizeExclude == 1 && SplitHalf == 1 && FinalFigure == 1
                 
